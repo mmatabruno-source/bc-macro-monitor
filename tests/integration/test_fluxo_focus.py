@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
+from src.comum.isolamento import _executar_isolado
 from src.focus.comparador import DivulgacaoFocus
 from src.focus.fluxo import processar
 
@@ -98,3 +99,23 @@ def test_troca_de_reuniao_notifica_sem_comparacao_numerica(estado_path):
 
     dados = json.loads(estado_path.read_text())
     assert dados["ultima_expectativa_copom"]["reuniao_id"] == "R5/2026"
+
+
+def test_falha_na_checagem_e_isolada_e_nao_altera_estado(estado_path):
+    """US3: exceção durante a checagem não deve corromper/alterar estado.json
+    e deve ser isolada via _executar_isolado, sem se propagar para fora."""
+    estado_path.write_text(json.dumps({
+        "ultima_expectativa_copom": {
+            "reuniao_id": "R5/2026",
+            "data_referencia": "2026-06-26",
+            "mediana_selic": 14.0,
+        }
+    }))
+    estado_original = estado_path.read_text()
+
+    with patch("src.focus.fluxo.buscar_proxima_reuniao", side_effect=RuntimeError("API fora do ar")):
+        resultado = _executar_isolado("Focus/Copom", processar)
+
+    assert resultado["falhou"] is True
+    assert resultado["processado"] is False
+    assert estado_path.read_text() == estado_original
