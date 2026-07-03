@@ -5,6 +5,7 @@ import os
 
 from src.comum.isolamento import _executar_isolado, notificar_falha
 from src.focus.fluxo import processar as processar_focus
+from src.ipca.fluxo import processar as processar_ipca
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,8 +21,17 @@ def main():
             chat_id=os.environ.get("FOCUS_TELEGRAM_CHAT_ID"),
         )
 
-    # Fluxos 002 (Relatório de Política Monetária) e 003 (IPCA) serão
-    # adicionados aqui quando suas respectivas features forem implementadas.
+    resultado_ipca = _executar_isolado("IPCA", processar_ipca)
+    if resultado_ipca["falhou"]:
+        notificar_falha(
+            "processamento inesperado do fluxo IPCA",
+            resultado_ipca["erro"],
+            token=os.environ.get("IPCA_TELEGRAM_BOT_TOKEN"),
+            chat_id=os.environ.get("IPCA_TELEGRAM_CHAT_ID"),
+        )
+
+    # Fluxo 002 (Relatório de Política Monetária) será adicionado aqui
+    # quando a feature for implementada.
 
 
 if __name__ == "__main__":
