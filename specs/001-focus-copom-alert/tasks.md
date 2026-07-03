@@ -26,9 +26,9 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 
 **Purpose**: Inicialização do projeto e estrutura básica compartilhada pelos três fluxos do repositório (este é o primeiro fluxo implementado, então a estrutura comum nasce aqui).
 
-- [ ] T001 Criar estrutura de diretórios `src/comum/`, `src/focus/`, `tests/contract/`, `tests/integration/`, `tests/unit/`, `historico/focus/` conforme `plan.md`
-- [ ] T002 Criar `requirements.txt` na raiz com `requests` e `pytest` (únicas dependências, por Princípio VII)
-- [ ] T003 [P] Criar `estado.json` inicial na raiz com objeto vazio `{}` (chaves por fluxo são adicionadas em runtime)
+- [x] T001 Criar estrutura de diretórios `src/comum/`, `src/focus/`, `tests/contract/`, `tests/integration/`, `tests/unit/`, `historico/focus/` conforme `plan.md`
+- [x] T002 Criar `requirements.txt` na raiz com `requests` e `pytest` (únicas dependências, por Princípio VII)
+- [x] T003 [P] Criar `estado.json` inicial na raiz com objeto vazio `{}` (chaves por fluxo são adicionadas em runtime)
 
 **Checkpoint**: Estrutura pronta para receber código de infraestrutura comum e do fluxo Focus.
 
@@ -41,13 +41,13 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 **⚠️ CRITICAL**: Nenhuma tarefa de user story pode começar antes desta fase estar completa.
 
 - [x] T004 Solicitar ao usuário o payload JSON real de uma chamada de teste ao endpoint `ExpectativasMercadoSelic` (Olinda) e preencher `specs/001-focus-copom-alert/contracts/focus-api.md` com o schema observado. **Concluída em 2026-07-03** — schema, regra de `baseCalculo` e regra de identificação da próxima reunião confirmados por 4 chamadas reais; T012/T015/T030 desbloqueadas.
-- [ ] T005 [P] Implementar `_retentavel(status_code)` e `_espera_para_tentativa(resposta, tentativa)` em `src/comum/http_retry.py`, adaptados do padrão validado no copom-monitor-pm (retry em 429/5xx, respeita `Retry-After`, nunca retenta 4xx permanente)
-- [ ] T006 [P] Implementar `enviar_mensagem(texto, token, chat_id)` com fallback de formatação Markdown → texto simples e `_sanitizar(texto, token)` em `src/comum/telegram.py`, reaproveitando a assinatura do copom-monitor-pm
-- [ ] T007 [P] Implementar leitura/escrita de `estado.json` por chave de fluxo em `src/comum/estado.py` (funções `ler_estado(chave)` e `gravar_estado(chave, valor)`, sem depender do formato interno de nenhum fluxo específico)
-- [ ] T008 [P] Implementar `_executar_isolado(nome, verificar)` em `src/comum/isolamento.py`, reaproveitado do copom-monitor-pm, e `notificar_falha(contexto, erro, token, chat_id)` parametrizado por bot/chat (Princípio IV — sem bot padrão)
-- [ ] T009 Criar `src/main.py` como ponto de entrada único do GitHub Actions, chamando o fluxo Focus através de `_executar_isolado` (T008); estrutura para os fluxos 002/003 será adicionada em features futuras, sem implementá-los aqui
-- [ ] T010 [P] Testes unitários de `src/comum/http_retry.py` em `tests/unit/test_http_retry.py` (retenta 429/5xx, respeita `Retry-After`, não retenta 404)
-- [ ] T011 [P] Testes unitários de `src/comum/estado.py` em `tests/unit/test_estado.py` (leitura/escrita por chave, chave ausente retorna `None`/vazio sem exceção)
+- [x] T005 [P] Implementar `_retentavel(status_code)` e `_espera_para_tentativa(resposta, tentativa)` em `src/comum/http_retry.py`, adaptados do padrão validado no copom-monitor-pm (retry em 429/5xx, respeita `Retry-After`, nunca retenta 4xx permanente)
+- [x] T006 [P] Implementar `enviar_mensagem(texto, token, chat_id)` com fallback de formatação Markdown → texto simples e `_sanitizar(texto, token)` em `src/comum/telegram.py`, reaproveitando a assinatura do copom-monitor-pm
+- [x] T007 [P] Implementar leitura/escrita de `estado.json` por chave de fluxo em `src/comum/estado.py` (funções `ler_estado(chave)` e `gravar_estado(chave, valor)`, sem depender do formato interno de nenhum fluxo específico)
+- [x] T008 [P] Implementar `_executar_isolado(nome, verificar)` em `src/comum/isolamento.py`, reaproveitado do copom-monitor-pm, e `notificar_falha(contexto, erro, token, chat_id)` parametrizado por bot/chat (Princípio IV — sem bot padrão)
+- [x] T009 Criar `src/main.py` como ponto de entrada único do GitHub Actions, chamando o fluxo Focus através de `_executar_isolado` (T008); estrutura para os fluxos 002/003 será adicionada em features futuras, sem implementá-los aqui
+- [x] T010 [P] Testes unitários de `src/comum/http_retry.py` em `tests/unit/test_http_retry.py` (retenta 429/5xx, respeita `Retry-After`, não retenta 404)
+- [x] T011 [P] Testes unitários de `src/comum/estado.py` em `tests/unit/test_estado.py` (leitura/escrita por chave, chave ausente retorna `None`/vazio sem exceção)
 
 **Checkpoint**: Infraestrutura comum pronta e testada — user stories do fluxo Focus podem começar. T004 concluída; nenhum bloqueio restante.
 
@@ -61,17 +61,17 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 
 ### Tests for User Story 1
 
-- [ ] T012 [P] [US1] Contract test do parser da API Focus em `tests/contract/test_contrato_focus.py`, usando o payload real em `tests/fixtures/focus_divulgacao_2026-06-26.json` e as regras documentadas em `contracts/focus-api.md`
-- [ ] T013 [P] [US1] Testes unitários da lógica de comparação (subiu/desceu/manteve/inicial) em `tests/unit/test_comparador.py`, usando fixtures de `DivulgacaoFocus` simuladas (independe do contrato real da API)
-- [ ] T014 [P] [US1] Teste de integração do fluxo completo (checar → comparar → notificar → gravar estado) em `tests/integration/test_fluxo_focus.py`, com API Focus mockada a partir de `tests/fixtures/focus_divulgacao_2026-06-26.json`
+- [x] T012 [P] [US1] Contract test do parser da API Focus em `tests/contract/test_contrato_focus.py`, usando o payload real em `tests/fixtures/focus_divulgacao_2026-06-26.json` e as regras documentadas em `contracts/focus-api.md`
+- [x] T013 [P] [US1] Testes unitários da lógica de comparação (subiu/desceu/manteve/inicial) em `tests/unit/test_comparador.py`, usando fixtures de `DivulgacaoFocus` simuladas (independe do contrato real da API)
+- [x] T014 [P] [US1] Teste de integração do fluxo completo (checar → comparar → notificar → gravar estado) em `tests/integration/test_fluxo_focus.py`, com API Focus mockada a partir de `tests/fixtures/focus_divulgacao_2026-06-26.json`
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Implementar `src/focus/cliente_expectativas.py`: cliente HTTP para o endpoint Focus (usa `src/comum/http_retry.py`), aplicando as Regras 1 e 2 de `contracts/focus-api.md` (filtra `baseCalculo = 0`, escolhe a `Reuniao` de menor `(ano, número)` na divulgação mais recente), retornando `reuniao_id`, `data_referencia` e `mediana_selic`
-- [ ] T016 [US1] Implementar `src/focus/comparador.py`: dado o registro anterior (ou ausência dele) e a nova `DivulgacaoFocus`, retorna a direção (`subiu`/`desceu`/`manteve`/`inicial`) conforme `data-model.md`
-- [ ] T017 [US1] Implementar `src/focus/fluxo.py`: orquestra checagem (T015) → comparação (T016) → montagem da mensagem de notificação → envio via `enviar_mensagem` (T006) → gravação de estado via `src/comum/estado.py` (T007) SOMENTE após confirmação de envio bem-sucedido (FR-006)
-- [ ] T018 [US1] Implementar gravação de histórico em `historico/focus/<data_referencia>.json` a cada divulgação processada com sucesso, em `src/focus/fluxo.py`
-- [ ] T019 [US1] Adicionar logging estruturado (sem vazar token) nas etapas de `src/focus/fluxo.py`, usando `_sanitizar` (T006) em qualquer log que inclua resposta/erro de rede
+- [x] T015 [US1] Implementar `src/focus/cliente_expectativas.py`: cliente HTTP para o endpoint Focus (usa `src/comum/http_retry.py`), aplicando as Regras 1 e 2 de `contracts/focus-api.md` (filtra `baseCalculo = 0`, escolhe a `Reuniao` de menor `(ano, número)` na divulgação mais recente), retornando `reuniao_id`, `data_referencia` e `mediana_selic`
+- [x] T016 [US1] Implementar `src/focus/comparador.py`: dado o registro anterior (ou ausência dele) e a nova `DivulgacaoFocus`, retorna a direção (`subiu`/`desceu`/`manteve`/`inicial`) conforme `data-model.md`
+- [x] T017 [US1] Implementar `src/focus/fluxo.py`: orquestra checagem (T015) → comparação (T016) → montagem da mensagem de notificação → envio via `enviar_mensagem` (T006) → gravação de estado via `src/comum/estado.py` (T007) SOMENTE após confirmação de envio bem-sucedido (FR-006)
+- [x] T018 [US1] Implementar gravação de histórico em `historico/focus/<data_referencia>.json` a cada divulgação processada com sucesso, em `src/focus/fluxo.py`
+- [x] T019 [US1] Adicionar logging estruturado (sem vazar token) nas etapas de `src/focus/fluxo.py`, usando `_sanitizar` (T006) em qualquer log que inclua resposta/erro de rede
 
 **Checkpoint**: User Story 1 completa e testável de forma independente — este é o MVP do fluxo Focus.
 
@@ -85,13 +85,13 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 
 ### Tests for User Story 2
 
-- [ ] T020 [P] [US2] Teste unitário de troca de reunião monitorada em `tests/unit/test_comparador.py` (mesma suíte de T013): `reuniao_id` nova → `direcao: inicial`, sem comparação numérica contra a reunião anterior
-- [ ] T021 [P] [US2] Teste de integração de rollover de reunião em `tests/integration/test_fluxo_focus.py` (mesma suíte de T014): estado aponta para reunião já passada, API retorna a próxima reunião real
+- [x] T020 [P] [US2] Teste unitário de troca de reunião monitorada em `tests/unit/test_comparador.py` (mesma suíte de T013): `reuniao_id` nova → `direcao: inicial`, sem comparação numérica contra a reunião anterior
+- [x] T021 [P] [US2] Teste de integração de rollover de reunião em `tests/integration/test_fluxo_focus.py` (mesma suíte de T014): estado aponta para reunião já passada, API retorna a próxima reunião real
 
 ### Implementation for User Story 2
 
-- [ ] T022 [US2] Estender `src/focus/comparador.py` (T016) para detectar mudança de `reuniao_id` em relação ao estado registrado e tratar como primeira leitura da nova reunião (reaproveita a mesma lógica de "sem baseline" da User Story 1, FR-008)
-- [ ] T023 [US2] Garantir em `src/focus/cliente_expectativas.py` (T015) que a "próxima reunião" é sempre recalculada a partir da resposta da API a cada execução, nunca de um valor fixo ou cacheado além do necessário para a checagem atual (Princípio VI)
+- [x] T022 [US2] Estender `src/focus/comparador.py` (T016) para detectar mudança de `reuniao_id` em relação ao estado registrado e tratar como primeira leitura da nova reunião (reaproveita a mesma lógica de "sem baseline" da User Story 1, FR-008)
+- [x] T023 [US2] Garantir em `src/focus/cliente_expectativas.py` (T015) que a "próxima reunião" é sempre recalculada a partir da resposta da API a cada execução, nunca de um valor fixo ou cacheado além do necessário para a checagem atual (Princípio VI)
 
 **Checkpoint**: User Stories 1 e 2 funcionam juntas — o fluxo sobrevive à passagem de reuniões sem intervenção manual.
 
@@ -105,13 +105,13 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 
 ### Tests for User Story 3
 
-- [ ] T024 [P] [US3] Teste de integração de falha isolada em `tests/integration/test_fluxo_focus.py` (mesma suíte de T014/T021): exceção durante checagem → `notificar_falha` chamado com token/chat_id do fluxo Focus, `estado.json` inalterado
-- [ ] T025 [P] [US3] Teste unitário de `_executar_isolado` (T008, já parcialmente coberto em foundational) com um "fluxo" fake que lança exceção, confirmando que a exceção não se propaga, em `tests/unit/test_isolamento.py`
+- [x] T024 [P] [US3] Teste de integração de falha isolada em `tests/integration/test_fluxo_focus.py` (mesma suíte de T014/T021): exceção durante checagem → `notificar_falha` chamado com token/chat_id do fluxo Focus, `estado.json` inalterado
+- [x] T025 [P] [US3] Teste unitário de `_executar_isolado` (T008, já parcialmente coberto em foundational) com um "fluxo" fake que lança exceção, confirmando que a exceção não se propaga, em `tests/unit/test_isolamento.py`
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Envolver a chamada ao fluxo Focus em `src/main.py` (T009) com `_executar_isolado` (T008), passando o nome do fluxo e o bot/chat_id do fluxo Focus para `notificar_falha`
-- [ ] T027 [US3] Garantir em `src/focus/fluxo.py` (T017) que qualquer exceção não tratada durante a checagem propaga para `_executar_isolado` sem gravar estado parcial em `estado.json`
+- [x] T026 [US3] Envolver a chamada ao fluxo Focus em `src/main.py` (T009) com `_executar_isolado` (T008), passando o nome do fluxo e o bot/chat_id do fluxo Focus para `notificar_falha`
+- [x] T027 [US3] Garantir em `src/focus/fluxo.py` (T017) que qualquer exceção não tratada durante a checagem propaga para `_executar_isolado` sem gravar estado parcial em `estado.json`
 
 **Checkpoint**: Todas as três user stories do fluxo Focus funcionam de forma independente e isolada.
 
@@ -121,10 +121,10 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 
 **Purpose**: Melhorias que afetam o fluxo como um todo, e preparação para o watchdog e para o workflow do GitHub Actions.
 
-- [ ] T028 [P] Criar workflow do GitHub Actions (`.github/workflows/focus-copom.yml`) que roda `src/main.py` em cron diário, injetando `FOCUS_TELEGRAM_BOT_TOKEN` e `FOCUS_TELEGRAM_CHAT_ID` via GitHub Secrets (Princípio IX)
-- [ ] T029 Rodar os cenários de `quickstart.md` manualmente (1 a 5, sem depender da API real) e confirmar os resultados esperados
-- [ ] T030 Rodar o cenário 6 de `quickstart.md` (chamada real à API Focus) e confirmar que o parser funciona contra a API de produção
-- [ ] T031 [P] Revisar todos os logs e mensagens de erro do fluxo Focus para confirmar que nenhum token aparece em texto plano (Princípio IX)
+- [x] T028 [P] Criar workflow do GitHub Actions (`.github/workflows/focus-copom.yml`) que roda `src/main.py` em cron diário, injetando `FOCUS_TELEGRAM_BOT_TOKEN` e `FOCUS_TELEGRAM_CHAT_ID` via GitHub Secrets (Princípio IX)
+- [x] T029 Rodar os cenários de `quickstart.md` manualmente (1 a 5, sem depender da API real) e confirmar os resultados esperados. **Concluída via suíte automatizada** (`tests/integration/test_fluxo_focus.py` cobre os 5 cenários; 30/30 testes passando) — dispensa execução manual em duplicidade.
+- [ ] T030 Rodar o cenário 6 de `quickstart.md` (chamada real à API Focus) e confirmar que o parser funciona contra a API de produção. **Pendente**: este ambiente de desenvolvimento não tem acesso de rede a `olinda.bcb.gov.br` (bloqueado pelo proxy). Só pode ser validado no primeiro run real do workflow `.github/workflows/focus-copom.yml` no GitHub Actions, ou localmente por você.
+- [x] T031 [P] Revisar todos os logs e mensagens de erro do fluxo Focus para confirmar que nenhum token aparece em texto plano (Princípio IX)
 
 ---
 
