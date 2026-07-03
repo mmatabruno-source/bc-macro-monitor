@@ -17,7 +17,6 @@ description: "Task list for feature 001-focus-copom-alert"
 
 - **[P]**: Pode rodar em paralelo (arquivos diferentes, sem dependência)
 - **[Story]**: US1, US2 ou US3 (ver spec.md)
-- **[BLOCKED]**: Tarefa bloqueada pelo Princípio II da constituição (contrato de API não verificado) — não iniciar antes de T004 ser concluída
 
 ## Path Conventions
 
@@ -41,7 +40,7 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 
 **⚠️ CRITICAL**: Nenhuma tarefa de user story pode começar antes desta fase estar completa.
 
-- [ ] T004 **[BLOCKED — Princípio II]** Solicitar ao usuário o payload JSON real de uma chamada de teste ao endpoint candidato `ExpectativasMercadoSelic` (Olinda) e preencher `specs/001-focus-copom-alert/contracts/focus-api.md` com o schema observado. **Não prosseguir para T012–T015 (implementação do cliente HTTP e parser) enquanto esta tarefa não estiver concluída.**
+- [x] T004 Solicitar ao usuário o payload JSON real de uma chamada de teste ao endpoint `ExpectativasMercadoSelic` (Olinda) e preencher `specs/001-focus-copom-alert/contracts/focus-api.md` com o schema observado. **Concluída em 2026-07-03** — schema, regra de `baseCalculo` e regra de identificação da próxima reunião confirmados por 4 chamadas reais; T012/T015/T030 desbloqueadas.
 - [ ] T005 [P] Implementar `_retentavel(status_code)` e `_espera_para_tentativa(resposta, tentativa)` em `src/comum/http_retry.py`, adaptados do padrão validado no copom-monitor-pm (retry em 429/5xx, respeita `Retry-After`, nunca retenta 4xx permanente)
 - [ ] T006 [P] Implementar `enviar_mensagem(texto, token, chat_id)` com fallback de formatação Markdown → texto simples e `_sanitizar(texto, token)` em `src/comum/telegram.py`, reaproveitando a assinatura do copom-monitor-pm
 - [ ] T007 [P] Implementar leitura/escrita de `estado.json` por chave de fluxo em `src/comum/estado.py` (funções `ler_estado(chave)` e `gravar_estado(chave, valor)`, sem depender do formato interno de nenhum fluxo específico)
@@ -50,7 +49,7 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 - [ ] T010 [P] Testes unitários de `src/comum/http_retry.py` em `tests/unit/test_http_retry.py` (retenta 429/5xx, respeita `Retry-After`, não retenta 404)
 - [ ] T011 [P] Testes unitários de `src/comum/estado.py` em `tests/unit/test_estado.py` (leitura/escrita por chave, chave ausente retorna `None`/vazio sem exceção)
 
-**Checkpoint**: Infraestrutura comum pronta e testada — user stories do fluxo Focus podem começar. T004 permanece como bloqueio explícito até resolvida.
+**Checkpoint**: Infraestrutura comum pronta e testada — user stories do fluxo Focus podem começar. T004 concluída; nenhum bloqueio restante.
 
 ---
 
@@ -62,13 +61,13 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 
 ### Tests for User Story 1
 
-- [ ] T012 [P] [US1] **[BLOCKED até T004]** Contract test do parser da API Focus em `tests/contract/test_contrato_focus.py`, usando o payload real documentado em `contracts/focus-api.md`
+- [ ] T012 [P] [US1] Contract test do parser da API Focus em `tests/contract/test_contrato_focus.py`, usando o payload real em `tests/fixtures/focus_divulgacao_2026-06-26.json` e as regras documentadas em `contracts/focus-api.md`
 - [ ] T013 [P] [US1] Testes unitários da lógica de comparação (subiu/desceu/manteve/inicial) em `tests/unit/test_comparador.py`, usando fixtures de `DivulgacaoFocus` simuladas (independe do contrato real da API)
-- [ ] T014 [P] [US1] Teste de integração do fluxo completo (checar → comparar → notificar → gravar estado) em `tests/integration/test_fluxo_focus.py`, com API Focus mockada a partir de fixtures
+- [ ] T014 [P] [US1] Teste de integração do fluxo completo (checar → comparar → notificar → gravar estado) em `tests/integration/test_fluxo_focus.py`, com API Focus mockada a partir de `tests/fixtures/focus_divulgacao_2026-06-26.json`
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] **[BLOCKED até T004]** Implementar `src/focus/cliente_expectativas.py`: cliente HTTP para o endpoint Focus (usa `src/comum/http_retry.py`), retornando a mediana da Selic e a data de referência para a próxima reunião, conforme `contracts/focus-api.md`
+- [ ] T015 [US1] Implementar `src/focus/cliente_expectativas.py`: cliente HTTP para o endpoint Focus (usa `src/comum/http_retry.py`), aplicando as Regras 1 e 2 de `contracts/focus-api.md` (filtra `baseCalculo = 0`, escolhe a `Reuniao` de menor `(ano, número)` na divulgação mais recente), retornando `reuniao_id`, `data_referencia` e `mediana_selic`
 - [ ] T016 [US1] Implementar `src/focus/comparador.py`: dado o registro anterior (ou ausência dele) e a nova `DivulgacaoFocus`, retorna a direção (`subiu`/`desceu`/`manteve`/`inicial`) conforme `data-model.md`
 - [ ] T017 [US1] Implementar `src/focus/fluxo.py`: orquestra checagem (T015) → comparação (T016) → montagem da mensagem de notificação → envio via `enviar_mensagem` (T006) → gravação de estado via `src/comum/estado.py` (T007) SOMENTE após confirmação de envio bem-sucedido (FR-006)
 - [ ] T018 [US1] Implementar gravação de histórico em `historico/focus/<data_referencia>.json` a cada divulgação processada com sucesso, em `src/focus/fluxo.py`
@@ -124,7 +123,7 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 
 - [ ] T028 [P] Criar workflow do GitHub Actions (`.github/workflows/focus-copom.yml`) que roda `src/main.py` em cron diário, injetando `FOCUS_TELEGRAM_BOT_TOKEN` e `FOCUS_TELEGRAM_CHAT_ID` via GitHub Secrets (Princípio IX)
 - [ ] T029 Rodar os cenários de `quickstart.md` manualmente (1 a 5, sem depender da API real) e confirmar os resultados esperados
-- [ ] T030 **[BLOCKED até T004]** Rodar o cenário 6 de `quickstart.md` (chamada real à API Focus) e confirmar que o parser funciona contra a API de produção
+- [ ] T030 Rodar o cenário 6 de `quickstart.md` (chamada real à API Focus) e confirmar que o parser funciona contra a API de produção
 - [ ] T031 [P] Revisar todos os logs e mensagens de erro do fluxo Focus para confirmar que nenhum token aparece em texto plano (Princípio IX)
 
 ---
@@ -134,17 +133,17 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 ### Phase Dependencies
 
 - **Setup (Phase 1)**: Sem dependências — pode começar imediatamente
-- **Foundational (Phase 2)**: Depende do Setup. T004 (payload real da API) bloqueia T012 e T015 na Phase 3, mas não bloqueia T005–T011
+- **Foundational (Phase 2)**: Depende do Setup
 - **User Story 1 (Phase 3)**: Depende da Foundational completa. É o MVP
 - **User Story 2 (Phase 4)**: Depende da User Story 1 (estende `comparador.py` e `cliente_expectativas.py` criados ali)
 - **User Story 3 (Phase 5)**: Depende da Foundational (T008/T009) e da User Story 1 (`fluxo.py`); independente da User Story 2
-- **Polish (Phase 6)**: Depende de todas as user stories desejadas estarem completas; T030 depende de T004
+- **Polish (Phase 6)**: Depende de todas as user stories desejadas estarem completas
 
 ### Parallel Opportunities
 
 - T005–T008 (Foundational, arquivos diferentes) podem rodar em paralelo
 - T010–T011 (testes unitários de infraestrutura) podem rodar em paralelo entre si e com T005–T008 já concluídas
-- T013–T014 podem rodar em paralelo com T012 (T012 fica bloqueada por T004, mas T013/T014 não dependem do contrato real)
+- T012–T014 podem rodar em paralelo entre si (arquivos diferentes)
 - T020–T021 podem rodar em paralelo entre si
 
 ---
@@ -153,15 +152,14 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 
 ### MVP First (User Story 1)
 
-1. Completar Phase 1 (Setup) e Phase 2 (Foundational) — **exceto T004, que pode ficar pendente sem bloquear T005–T011**
-2. Pedir ao usuário o payload real da API (T004) o quanto antes, em paralelo ao resto da Foundational
-3. Completar Phase 3 (User Story 1) assim que T004 for resolvida para as tarefas T012/T015; as demais tarefas de US1 não dependem de T004
-4. **PARAR e VALIDAR**: rodar `quickstart.md` cenários 1–3 antes de prosseguir
-5. Deploy do MVP (workflow do GitHub Actions) já é possível após User Story 1
+1. Completar Phase 1 (Setup) e Phase 2 (Foundational)
+2. Completar Phase 3 (User Story 1)
+3. **PARAR e VALIDAR**: rodar `quickstart.md` cenários 1–3 antes de prosseguir
+4. Deploy do MVP (workflow do GitHub Actions) já é possível após User Story 1
 
 ### Incremental Delivery
 
-1. Setup + Foundational → base pronta (com T004 como pendência sinalizada, não bloqueante do todo)
+1. Setup + Foundational → base pronta
 2. User Story 1 → validar independentemente → MVP pronto para deploy
 3. User Story 2 → validar independentemente → fluxo sobrevive à passagem de reuniões
 4. User Story 3 → validar independentemente → fluxo resiliente a falhas
@@ -171,5 +169,5 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 
 - [P] tasks = arquivos diferentes, sem dependência
 - Um commit por tarefa (`T0XX: <resumo>`), conforme Princípio I da constituição
-- T004 é a tarefa mais crítica do ponto de vista de processo: nenhuma linha de `src/focus/cliente_expectativas.py` ou `tests/contract/test_contrato_focus.py` deve ser escrita antes dela
+- T004 (obtenção do contrato real da API Focus) foi concluída em 2026-07-03 antes de qualquer código de `src/focus/cliente_expectativas.py` ou `tests/contract/test_contrato_focus.py`, conforme Princípio II
 - Verificar que os testes falham antes de implementar (quando aplicável)

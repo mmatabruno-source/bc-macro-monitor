@@ -2,39 +2,40 @@
 
 ## R1 — Formato do payload da API de Expectativas de Mercado (Focus)
 
-- **Status**: 🔴 **BLOQUEADO — sem decisão possível ainda.**
-- **Decision**: Nenhuma. Por Princípio II da constituição (nunca codificar
-  contra um contrato de API não verificado), este projeto não escreve
-  cliente HTTP, parser ou schema de campos a partir de documentação
-  pública/terceiros. O endpoint candidato levantado por pesquisa pública é
-  `https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/...`
-  (serviço `ExpectativasMercadoSelic`), mas isso é apenas uma hipótese de
-  onde consultar — não uma confirmação de formato.
-- **Rationale**: no projeto irmão copom-monitor-pm, assumir o formato de um
-  payload não verificado causou retrabalho em produção; este projeto não
-  repete o erro.
-- **Alternatives considered**: N/A — não há alternativa a "esperar o
-  payload real", pois é uma regra do projeto, não uma escolha técnica.
-- **Ação necessária antes da Phase 1 poder ser concluída para este item**:
-  o usuário precisa colar a resposta JSON real de uma chamada de teste
-  (navegador, curl ou Postman) ao endpoint candidato, filtrando pela
-  reunião de Copom mais próxima. Isso vira `contracts/focus-api.md` assim
-  que disponível.
+- **Status**: ✅ Resolvido em 2026-07-03, via chamadas de teste reais.
+- **Decision**: endpoint `ExpectativasMercadoSelic` do serviço Expectativas
+  (Olinda), campos `Indicador`, `Data`, `Reuniao`, `Mediana`,
+  `numeroRespondentes`, `baseCalculo` (schema completo e regras de seleção
+  em `contracts/focus-api.md`).
+- **Rationale**: confirmado por 4 chamadas reais (service document,
+  `$metadata`, filtro por `Reuniao`, filtro por `Data`), nunca assumido a
+  partir de documentação de terceiros.
+- **Alternatives considered**: N/A.
 
 ## R2 — Como identificar "a próxima reunião do Copom" a partir da resposta
 
-- **Status**: 🟡 Depende do payload real (R1) para a implementação exata,
-  mas a estratégia geral já pode ser decidida no nível de spec/plano.
-- **Decision**: a lógica de negócio (independente do formato exato do
-  campo) é: dentre as reuniões futuras presentes na resposta, escolher a
-  de data mais próxima da data de execução. Isso é testável com dados
-  simulados (fixtures) antes mesmo do contrato real, desde que os testes de
-  contrato fiquem separados dos testes de lógica pura.
-- **Rationale**: consistente com FR-002 do spec (API oficial como fonte de
-  verdade para qual é a próxima reunião, nunca calendário fixo).
-- **Alternatives considered**: manter uma lista de datas de reunião
-  versionada no repositório — rejeitada, pois viola Princípio VI
-  (calendário nunca decide, só pode ajustar frequência de checagem).
+- **Status**: ✅ Resolvido em 2026-07-03, via chamada de teste real.
+- **Decision**: entre todas as linhas retornadas para a divulgação mais
+  recente (`Data` mais recente), parsear `Reuniao` como `(ano, número)` a
+  partir do formato `"R<número>/<ano>"` e escolher a de menor par
+  `(ano, número)`. Ver Regra 2 em `contracts/focus-api.md`.
+- **Rationale**: evidência empírica mostrou que a API já exclui reuniões
+  passadas de cada divulgação — a menor `Reuniao` presente é, por
+  construção, a próxima. Isso dispensa qualquer fonte externa de
+  calendário (Atas do copom-monitor-pm, release de imprensa, ou tabela
+  hardcoded), consistente com FR-002 e com o Princípio VI (API oficial como
+  única fonte de verdade, nunca calendário).
+- **Alternatives considered**:
+  - Manter uma lista de datas de reunião versionada no repositório —
+    rejeitada, viola Princípio VI.
+  - Derivar o mapeamento `Reuniao` ↔ data real a partir do endpoint de
+    Atas do BCB (`sitebcb/copom/atas`, já validado pelo copom-monitor-pm),
+    contando reuniões por ano — considerada, mas descartada por ser
+    desnecessária: a Regra 2 acima resolve o problema original (identificar
+    a próxima reunião) sem precisar de datas de calendário reais, com uma
+    fonte de dado a menos para manter e sem a exceção de "hardcode
+    revisado anualmente" que o endpoint de Atas exigiria para o horizonte
+    sem Ata publicada.
 
 ## R3 — Padrões de resiliência a reaproveitar do copom-monitor-pm
 
@@ -68,8 +69,7 @@
 
 ## Resumo de bloqueios para a Phase 1
 
-Apenas o item R1 (formato exato do payload) bloqueia a conclusão de
-`contracts/focus-api.md` com o schema de campos. Os demais artefatos de
-Phase 1 (`data-model.md`, `quickstart.md`) podem ser escritos em termos de
-conceitos de negócio (mediana, divulgação, reunião) sem depender do nome
-exato dos campos JSON, e serão refinados quando o contrato real chegar.
+Nenhum bloqueio restante. R1 e R2 foram resolvidos com payloads reais em
+2026-07-03; `contracts/focus-api.md` está completo e as tarefas de
+implementação do cliente HTTP (T004/T012/T015 em `tasks.md`) podem
+prosseguir.

@@ -1,25 +1,27 @@
 # Data Model: Alerta de Mudança Relevante no Focus para a Próxima Reunião do Copom
 
-> Os nomes de campo abaixo são conceituais (nível de negócio). Os nomes
-> reais de campos JSON retornados pela API do Focus só serão definidos em
-> `contracts/focus-api.md` depois que o payload real for verificado
-> (Princípio II da constituição) — ver `research.md`, item R1.
+> Mapeamento confirmado contra o contrato real em `contracts/focus-api.md`
+> (verificado em 2026-07-03).
 
 ## Entidade: DivulgacaoFocus
 
 Representa uma publicação específica do boletim Focus para a próxima
 reunião do Copom, no momento em que foi lida pelo sistema.
 
-| Campo | Tipo | Descrição | Regras |
-|---|---|---|---|
-| `reuniao_id` | string | Identificador/data da reunião do Copom a que a divulgação se refere | Determinado a partir da API a cada execução (Princípio VI); nunca hardcoded |
-| `data_referencia` | date (ISO 8601) | Data de referência da divulgação/pesquisa Focus | Usada como chave de idempotência (FR-004a) — distingue "nova divulgação" de "mesma divulgação relida" |
-| `mediana_selic` | number | Mediana das expectativas de mercado para a Selic nessa reunião | Única estatística usada como fonte de verdade (FR-011); demais estatísticas do Focus são ignoradas |
+| Campo | Tipo | Campo real da API (`ExpectativasMercadoSelic`) | Descrição | Regras |
+|---|---|---|---|---|
+| `reuniao_id` | string | `Reuniao` (ex.: `"R5/2026"`) | Identificador da reunião do Copom a que a divulgação se refere | Escolhida como a de menor `(ano, número)` entre as `Reuniao` presentes na divulgação mais recente (contracts/focus-api.md, Regra 2); nunca hardcoded |
+| `data_referencia` | date (ISO 8601) | `Data` | Data de referência da divulgação/pesquisa Focus | Usada como chave de idempotência (FR-004a) — distingue "nova divulgação" de "mesma divulgação relida" |
+| `mediana_selic` | number | `Mediana` (linha com `baseCalculo = 0`) | Mediana das expectativas de mercado para a Selic nessa reunião | Única estatística usada como fonte de verdade (FR-011); `Media`, `DesvioPadrao`, `Minimo`, `Maximo` são ignorados; `baseCalculo = 1` é ignorado (contracts/focus-api.md, Regra 1) |
 
 **Regras de validação**:
 - `data_referencia` MUST ser estritamente mais recente que a última
   divulgação processada da mesma `reuniao_id` para ser considerada nova
   (FR-004a).
+- `reuniao_id` MUST ser calculada tomando o menor `(ano, número)` entre
+  todas as linhas com `Data` igual à divulgação mais recente e
+  `baseCalculo = 0` (contracts/focus-api.md, Regra 2). Reuniões passadas
+  nunca aparecem na resposta da API, então esta regra basta.
 - Quando `reuniao_id` muda em relação ao estado anterior (a reunião
   monitorada virou passado), a nova `DivulgacaoFocus` é tratada como
   primeira leitura daquela reunião — sem comparação direcional (FR-008).

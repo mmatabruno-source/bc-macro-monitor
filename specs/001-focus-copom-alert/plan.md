@@ -57,14 +57,13 @@ necessidade de otimização.
 
 - **Princípio I (Spec-Driven, sem exceções)**: ✅ este plano só existe porque
   spec.md já foi criado, validado e clarificado antes dele.
-- **Princípio II (Nunca codificar contra contrato não verificado)**: ⚠
-  **GATE BLOQUEANTE** — o payload real do endpoint `ExpectativasMercadoSelic`
-  (Olinda) ainda não foi fornecido pelo usuário. Nenhum cliente HTTP,
-  parser ou `contracts/*.md` com formato de campos pode ser escrito até que
-  isso aconteça. A Phase 0 (research.md) e a Phase 1 (contracts/) deste
-  plano documentam essa dependência explicitamente como bloqueio, em vez de
-  assumir um formato. A primeira tarefa técnica de `/speckit-tasks` deste
-  fluxo será justamente solicitar esse payload ao usuário.
+- **Princípio II (Nunca codificar contra contrato não verificado)**: ✅
+  Resolvido em 2026-07-03 — o payload real do endpoint
+  `ExpectativasMercadoSelic` (Olinda) foi fornecido pelo usuário via 4
+  chamadas de teste reais (service document, `$metadata`, filtro por
+  `Reuniao`, filtro por `Data`). `contracts/focus-api.md` documenta o
+  schema completo e as regras de seleção (`baseCalculo`, identificação da
+  próxima reunião) a partir desses payloads reais, sem nenhuma suposição.
 - **Princípio III (Isolamento entre fluxos)**: ✅ este fluxo usa sua própria
   chave de estado (`ultima_expectativa_copom`) e diretório de histórico
   (`historico/focus/`), e seu processamento MUST ser envolvido pelo mesmo
