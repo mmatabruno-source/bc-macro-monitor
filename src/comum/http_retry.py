@@ -1,6 +1,7 @@
 """Retry HTTP seletivo, reaproveitado do padrão validado no copom-monitor-pm."""
 
 import logging
+import re
 import time
 
 import requests
@@ -9,6 +10,14 @@ logger = logging.getLogger(__name__)
 
 ESPERA_INICIAL_SEGUNDOS = 2
 MAX_TENTATIVAS_PADRAO = 3
+
+_PADRAO_TOKEN_TELEGRAM = re.compile(r"/bot[^/]+/")
+
+
+def _url_sanitizada(url):
+    # URLs do Telegram carregam o token do bot no path (/bot<token>/...);
+    # nunca logar isso em texto plano (Princípio IX).
+    return _PADRAO_TOKEN_TELEGRAM.sub("/bot***/", url)
 
 
 def _retentavel(status_code):
@@ -44,7 +53,7 @@ def requisitar_com_retry(metodo, url, max_tentativas=MAX_TENTATIVAS_PADRAO, **kw
                 "Falha de rede na tentativa %d/%d para %s: %s",
                 tentativa,
                 max_tentativas,
-                url,
+                _url_sanitizada(url),
                 exc,
             )
             time.sleep(_espera_para_tentativa(None, tentativa))
@@ -61,7 +70,7 @@ def requisitar_com_retry(metodo, url, max_tentativas=MAX_TENTATIVAS_PADRAO, **kw
             resposta.status_code,
             tentativa,
             max_tentativas,
-            url,
+            _url_sanitizada(url),
         )
         time.sleep(_espera_para_tentativa(resposta, tentativa))
 

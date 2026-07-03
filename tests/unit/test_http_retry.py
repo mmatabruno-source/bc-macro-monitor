@@ -1,6 +1,11 @@
 from unittest.mock import patch
 
-from src.comum.http_retry import _espera_para_tentativa, _retentavel, requisitar_com_retry
+from src.comum.http_retry import (
+    _espera_para_tentativa,
+    _retentavel,
+    _url_sanitizada,
+    requisitar_com_retry,
+)
 
 
 class RespostaFake:
@@ -63,3 +68,22 @@ def test_requisitar_com_retry_nao_retenta_404(mock_request, _mock_sleep):
 
     assert resposta.status_code == 404
     assert mock_request.call_count == 1
+
+
+def test_url_sanitizada_remove_token_telegram():
+    url = "https://api.telegram.org/bot123456:ABC-DEF/sendMessage"
+
+    assert _url_sanitizada(url) == "https://api.telegram.org/bot***/sendMessage"
+
+
+@patch("src.comum.http_retry.time.sleep", return_value=None)
+@patch("src.comum.http_retry.requests.request")
+def test_retry_nao_vaza_token_no_log(mock_request, _mock_sleep, caplog):
+    mock_request.side_effect = [RespostaFake(503), RespostaFake(200, text="ok")]
+    url = "https://api.telegram.org/bot123456:ABC-DEF/sendMessage"
+
+    with caplog.at_level("WARNING"):
+        requisitar_com_retry("POST", url, max_tentativas=3)
+
+    assert "123456:ABC-DEF" not in caplog.text
+    assert "bot***" in caplog.text
