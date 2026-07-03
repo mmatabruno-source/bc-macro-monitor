@@ -8,6 +8,16 @@
 
 **Input**: User description: "Notificar a divulgação mensal do IPCA com leitura objetiva do número e breve leitura de impacto para portfólio"
 
+## Clarifications
+
+### Session 2026-07-03
+
+- Q: A leitura de impacto para portfólio (FR-009) deve usar um LLM (como
+  Ata/Relatório) ou formatação direta baseada em regras? → A: Regra direta,
+  sem LLM — é só um número, sem "tom" de texto a interpretar; lógica
+  determinística (ex.: comparação com o mês anterior e com o centro da
+  meta de inflação) é mais simples, mais barata e mais fácil de testar.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Ser avisado assim que o IPCA do mês é divulgado (Priority: P1)
@@ -136,12 +146,10 @@ que `estado.json` não é alterado para este fluxo.
   informar que a checagem pode ser feita com frequência reduzida fora da
   janela usual de divulgação, nunca decidir se a checagem ocorre).
 - **FR-009**: A geração da leitura de impacto para portfólio MUST usar
-  [NEEDS CLARIFICATION: a leitura de impacto usa um LLM (como os fluxos de
-  Ata/Relatório) para interpretar o número, ou é uma formatação direta
-  baseada em regras simples (ex.: "acima/abaixo do centro da meta",
-  "acelerou/desacelerou em relação ao mês anterior")? Não deve ser assumido
-  que precisa de LLM só porque os outros fluxos usam — aqui não há "tom" de
-  texto a interpretar, apenas um número].
+  formatação direta baseada em regras determinísticas (sem LLM),
+  comparando o valor do mês com o valor do mês anterior (acelerou/
+  desacelerou) e com o centro da meta de inflação vigente
+  (acima/abaixo/em linha), sem depender de nenhuma chave de API de LLM.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -191,3 +199,11 @@ que `estado.json` não é alterado para este fluxo.
   diferente, ficam fora do escopo mínimo deste fluxo (FR-003 exige apenas o
   número objetivo da série 433), podendo ser adicionados como melhoria
   futura sem alterar o núcleo do fluxo.
+- O centro da meta de inflação vigente (usado por FR-009 para a leitura de
+  impacto) é definido anualmente pelo CMN por resolução, não por uma API
+  com atualização contínua — este valor é tratado como um parâmetro de
+  política raramente alterado, revisado manualmente quando o CMN divulgar
+  a meta de um novo ano (mesmo espírito de exceção já usado para janelas
+  de cron no copom-monitor-pm), e não como violação do Princípio VI, já que
+  não decide se o fluxo verifica a série, apenas informa a leitura de texto
+  da notificação.

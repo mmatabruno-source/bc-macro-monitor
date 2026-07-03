@@ -13,8 +13,8 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
-- [x] Requirements are testable and unambiguous (except FR-009, flagged)
+- [x] No [NEEDS CLARIFICATION] markers remain
+- [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
 - [x] All acceptance scenarios are defined
@@ -31,8 +31,6 @@
 
 ## Notes
 
-- 1 open `[NEEDS CLARIFICATION]` em FR-009: se a leitura de impacto para
-  portfólio usa LLM ou formatação direta baseada em regras. O próprio
-  prompt do usuário pediu explicitamente para não assumir LLM só porque os
-  outros fluxos usam — resolver via `/speckit-clarify` antes de
-  `/speckit-plan`.
+- FR-009 resolvida via `/speckit-clarify` em 2026-07-03: leitura de
+  impacto por regra determinística, sem LLM. Todos os itens do checklist
+  passam. Spec pronta para `/speckit-plan`.
