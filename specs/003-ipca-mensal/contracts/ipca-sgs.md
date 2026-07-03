@@ -1,34 +1,49 @@
-# Contrato: Série 433 do SGS (IPCA mensal) — BLOQUEADO
+# Contrato: Série 433 do SGS (IPCA mensal)
 
-**Status**: 🔴 **NÃO VERIFICADO. Não usar para implementação.**
+**Status**: ✅ Verificado por chamada de teste real em 2026-07-03.
 
-Por Princípio II da constituição, este arquivo não pode conter um schema
-de campos até que o payload real de uma chamada de teste seja fornecido
-pelo usuário.
-
-## O que falta
-
-Colar aqui (ou em mensagem para o agente) a resposta real de:
+## Endpoint
 
 ```
-https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/3?formato=json
+GET https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/N?formato=json
 ```
 
-(3 últimos valores, para já observar pelo menos uma transição de mês).
+`N` = quantidade de valores mais recentes a retornar.
 
-## O que este contrato precisa documentar assim que o payload chegar
+## Payload real observado (`ultimos/3`)
 
-- Nome exato dos campos que contêm a data/mês de referência e o valor da
-  variação mensal.
-- Formato de data (ISO 8601? `dd/mm/yyyy`?).
-- Formato do valor (string ou número? separador decimal?).
-- Comportamento ao pedir mais registros (`ultimos/N` com N maior) e se há
-  paginação.
-- Códigos de status HTTP observados e formato de erro, se algum foi
-  testado.
+```json
+[{"data":"01/03/2026","valor":"0.88"},{"data":"01/04/2026","valor":"0.67"},{"data":"01/05/2026","valor":"0.58"}]
+```
 
-## Tarefas bloqueadas por este contrato
+## Schema
 
-Todas as tarefas de implementação de `src/ipca/cliente_sgs.py` e
-`tests/contract/test_contrato_ipca.py` em `tasks.md` ficam bloqueadas até
-este arquivo ser preenchido a partir de um payload real.
+| Campo | Tipo | Formato | Observações |
+|---|---|---|---|
+| `data` | string | `"DD/MM/YYYY"` | Sempre observado com `DD = "01"` nas 3 amostras — representa o mês de referência (não o dia real de divulgação). Mês/ano são as partes relevantes: `mes_referencia = "{YYYY}-{MM}"`. |
+| `valor` | string | número decimal com ponto (`"0.88"`) | Variação percentual mensal do IPCA. **Vem como string, não como número** — cliente deve converter com `float(valor)`. |
+
+## Regras de parsing
+
+- `mes_referencia` (chave de idempotência, FR-002) = `data[6:10] + "-" + data[3:5]`
+  (extrai `YYYY-MM` de `"01/MM/YYYY"`).
+- `variacao_mensal` = `float(valor)`.
+- A resposta é uma lista simples (array JSON), ordenada cronologicamente
+  (mais antigo primeiro, mais recente por último, conforme a amostra:
+  03/2026 → 04/2026 → 05/2026). O mês mais recente é o **último elemento**
+  da lista.
+
+## Fora de escopo / não verificado
+
+- Comportamento com `N` grande (paginação, limites) — não testado, não
+  necessário para este fluxo (basta `ultimos/2` para comparar mês atual
+  com o anterior).
+- Códigos de erro HTTP — nenhuma chamada de teste retornou erro.
+- Núcleos de inflação (séries adicionais do SGS) — fora do escopo mínimo
+  deste fluxo (ver spec.md, Assumptions).
+
+## Evidência (payload bruto)
+
+```json
+[{"data":"01/03/2026","valor":"0.88"},{"data":"01/04/2026","valor":"0.67"},{"data":"01/05/2026","valor":"0.58"}]
+```

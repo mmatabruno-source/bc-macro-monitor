@@ -1,17 +1,16 @@
 # Data Model: Notificação da Divulgação Mensal do IPCA
 
-> Nomes de campo conceituais (nível de negócio). Nomes reais de campos JSON
-> só serão definidos em `contracts/ipca-sgs.md` depois que o payload real
-> for verificado (Princípio II) — ver `research.md`, item R1.
+> Mapeamento confirmado contra o contrato real em `contracts/ipca-sgs.md`
+> (verificado em 2026-07-03).
 
 ## Entidade: DivulgacaoIpca
 
 Representa o valor do IPCA de um mês específico.
 
-| Campo | Tipo | Descrição | Regras |
-|---|---|---|---|
-| `mes_referencia` | string (YYYY-MM) | Mês a que o valor se refere | Usado como chave de idempotência (FR-002/FR-005) |
-| `variacao_mensal` | number | Variação percentual do IPCA no mês | Fonte de verdade para a notificação (FR-003) |
+| Campo | Tipo | Campo real da API (`bcdata.sgs.433`) | Descrição | Regras |
+|---|---|---|---|---|
+| `mes_referencia` | string (YYYY-MM) | `data` (`"DD/MM/YYYY"`, `DD="01"`) | Mês a que o valor se refere | Usado como chave de idempotência (FR-002/FR-005); extraído como `data[6:10]-data[3:5]` |
+| `variacao_mensal` | number | `valor` (string decimal) | Variação percentual do IPCA no mês | Fonte de verdade para a notificação (FR-003); convertido com `float(valor)` |
 
 ## Entidade: RegistroEstadoIpca (chave `ultimo_ipca` em `estado.json`)
 

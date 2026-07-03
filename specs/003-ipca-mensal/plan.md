@@ -46,12 +46,10 @@ falha deste fluxo não pode impedir os outros dois fluxos na mesma run.
 
 - **Princípio I**: ✅ este plano só existe porque spec.md já foi criado e
   clarificado antes dele.
-- **Princípio II (Nunca codificar contra contrato não verificado)**: 🔴
-  **GATE BLOQUEANTE** — o payload real da série 433 do SGS
-  (`https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/N?formato=json`)
-  ainda não foi fornecido pelo usuário nesta feature. Nenhum cliente HTTP,
-  parser ou `contracts/*.md` com formato de campos pode ser escrito até
-  que isso aconteça. Ver Phase 0 (research.md) para o pedido explícito.
+- **Princípio II (Nunca codificar contra contrato não verificado)**: ✅
+  Resolvido em 2026-07-03 — payload real de
+  `bcdata.sgs.433/dados/ultimos/3` fornecido pelo usuário. Schema
+  documentado em `contracts/ipca-sgs.md`.
 - **Princípio III (Isolamento entre fluxos)**: ✅ chave de estado
   (`ultimo_ipca`) e diretório de histórico (`historico/ipca/`) próprios;
   processamento envolvido por `_executar_isolado` (já implementado no
@@ -75,8 +73,7 @@ falha deste fluxo não pode impedir os outros dois fluxos na mesma run.
 - **Princípio IX (Segredos via GitHub Secrets)**: ✅ nenhum segredo
   codificado; token/chat_id deste fluxo vêm de variáveis de ambiente.
 
-**Resultado do gate**: BLOQUEADO em Princípio II até o usuário fornecer o
-payload real da série 433. Nenhuma outra violação identificada.
+**Resultado do gate**: PASS. Nenhuma violação identificada.
 
 ## Project Structure
 

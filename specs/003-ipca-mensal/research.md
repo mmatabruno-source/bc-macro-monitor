@@ -2,17 +2,15 @@
 
 ## R1 — Formato do payload da série 433 do SGS
 
-- **Status**: 🔴 **BLOQUEADO — aguardando payload real.**
-- **Decision**: Nenhuma. Por Princípio II, este projeto não escreve
-  cliente HTTP nem parser a partir de documentação pública/terceiros. O
-  endpoint candidato levantado por pesquisa pública é:
-  ```
-  https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/3?formato=json
-  ```
-  (últimos 3 valores, para já ver ao menos uma transição de mês na
-  resposta).
-- **Ação necessária**: pedir ao usuário para colar a resposta real dessa
-  URL (navegador, curl ou Postman).
+- **Status**: ✅ Resolvido em 2026-07-03, via chamada de teste real.
+- **Decision**: endpoint `bcdata.sgs.433/dados/ultimos/N`, campos `data`
+  (`"DD/MM/YYYY"`, sempre com `DD="01"`, representando o mês de
+  referência) e `valor` (string decimal, variação percentual mensal).
+  Schema completo em `contracts/ipca-sgs.md`.
+- **Rationale**: confirmado por chamada real
+  (`ultimos/3` → `[{"data":"01/03/2026","valor":"0.88"}, ...]`), nunca
+  assumido a partir de documentação de terceiros.
+- **Alternatives considered**: N/A.
 
 ## R2 — Núcleos de inflação (se disponíveis)
 
@@ -54,7 +52,6 @@
 
 ## Resumo de bloqueios para a Phase 1
 
-Apenas R1 bloqueia a conclusão de `contracts/ipca-sgs.md` com o schema de
-campos. `data-model.md` e `quickstart.md` serão escritos em termos de
-conceitos de negócio (mês de referência, valor mensal) sem depender do
-nome exato dos campos JSON.
+Nenhum bloqueio restante. R1 resolvido com payload real em 2026-07-03;
+`contracts/ipca-sgs.md` está completo e as tarefas de implementação do
+cliente HTTP podem prosseguir.
