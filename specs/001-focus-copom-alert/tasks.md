@@ -121,9 +121,9 @@ Projeto único (single project), conforme `plan.md`: `src/`, `tests/`, `estado.j
 
 **Purpose**: Melhorias que afetam o fluxo como um todo, e preparação para o watchdog e para o workflow do GitHub Actions.
 
-- [x] T028 [P] Criar workflow do GitHub Actions (`.github/workflows/focus-copom.yml`) que roda `src/main.py` em cron diário, injetando `FOCUS_TELEGRAM_BOT_TOKEN` e `FOCUS_TELEGRAM_CHAT_ID` via GitHub Secrets (Princípio IX)
+- [x] T028 [P] Criar workflow do GitHub Actions (`.github/workflows/monitor.yml`, consolidado — roda todos os fluxos ativos em uma única execução) que chama `src/main.py` em cron diário, injetando `FOCUS_TELEGRAM_BOT_TOKEN` e `FOCUS_TELEGRAM_CHAT_ID` via GitHub Secrets (Princípio IX)
 - [x] T029 Rodar os cenários de `quickstart.md` manualmente (1 a 5, sem depender da API real) e confirmar os resultados esperados. **Concluída via suíte automatizada** (`tests/integration/test_fluxo_focus.py` cobre os 5 cenários; 30/30 testes passando) — dispensa execução manual em duplicidade.
-- [ ] T030 Rodar o cenário 6 de `quickstart.md` (chamada real à API Focus) e confirmar que o parser funciona contra a API de produção. **Pendente**: este ambiente de desenvolvimento não tem acesso de rede a `olinda.bcb.gov.br` (bloqueado pelo proxy). Só pode ser validado no primeiro run real do workflow `.github/workflows/focus-copom.yml` no GitHub Actions, ou localmente por você.
+- [ ] T030 Rodar o cenário 6 de `quickstart.md` (chamada real à API Focus) e confirmar que o parser funciona contra a API de produção. **Pendente**: este ambiente de desenvolvimento não tem acesso de rede a `olinda.bcb.gov.br` (bloqueado pelo proxy). Só pode ser validado no primeiro run real do workflow `.github/workflows/monitor.yml` no GitHub Actions, ou localmente por você.
 - [x] T031 [P] Revisar todos os logs e mensagens de erro do fluxo Focus para confirmar que nenhum token aparece em texto plano (Princípio IX)
 
 ---

@@ -1,4 +1,4 @@
-name: Focus/Copom Monitor
+name: Monitor Macro do BC
 
 on:
   schedule:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  checar-focus:
+  checar-fluxos:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,10 +21,14 @@ jobs:
       - name: Instalar dependências
         run: pip install -r requirements.txt
 
-      - name: Rodar monitor
+      - name: Rodar monitor (todos os fluxos, isolados entre si)
         env:
           FOCUS_TELEGRAM_BOT_TOKEN: ${{ secrets.FOCUS_TELEGRAM_BOT_TOKEN }}
           FOCUS_TELEGRAM_CHAT_ID: ${{ secrets.FOCUS_TELEGRAM_CHAT_ID }}
+          IPCA_TELEGRAM_BOT_TOKEN: ${{ secrets.IPCA_TELEGRAM_BOT_TOKEN }}
+          IPCA_TELEGRAM_CHAT_ID: ${{ secrets.IPCA_TELEGRAM_CHAT_ID }}
+          RELATORIO_TELEGRAM_BOT_TOKEN: ${{ secrets.RELATORIO_TELEGRAM_BOT_TOKEN }}
+          RELATORIO_TELEGRAM_CHAT_ID: ${{ secrets.RELATORIO_TELEGRAM_CHAT_ID }}
         run: python -m src.main
 
       - name: Commitar estado e histórico atualizados
@@ -32,5 +36,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add estado.json historico/
-          git diff --cached --quiet || git commit -m "chore: atualizar estado do fluxo Focus/Copom [skip ci]"
+          git diff --cached --quiet || git commit -m "chore: atualizar estado dos fluxos [skip ci]"
           git push

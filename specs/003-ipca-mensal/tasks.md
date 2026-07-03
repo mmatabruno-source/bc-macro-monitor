@@ -24,7 +24,7 @@ Projeto único: `src/ipca/` (novo), `src/comum/` (reaproveitado do fluxo 001), `
 
 ## Phase 1: Setup
 
-- [ ] T001 Criar diretório `historico/ipca/` (com `.gitkeep`)
+- [x] T001 Criar diretório `historico/ipca/` (com `.gitkeep`)
 
 **Checkpoint**: `src/comum/` já existe do fluxo 001 — nenhuma infraestrutura nova necessária.
 
@@ -46,14 +46,14 @@ Projeto único: `src/ipca/` (novo), `src/comum/` (reaproveitado do fluxo 001), `
 
 ### Tests for User Story 1
 
-- [ ] T002 [P] [US1] Contract test do parser da série IPCA em `tests/contract/test_contrato_ipca.py`, usando `tests/fixtures/ipca_ultimos_3.json` e as regras de `contracts/ipca-sgs.md`
-- [ ] T003 [P] [US1] Teste de integração do fluxo completo (checar → notificar → gravar estado) em `tests/integration/test_fluxo_ipca.py`, com API mockada a partir da fixture
+- [x] T002 [P] [US1] Contract test do parser da série IPCA em `tests/contract/test_contrato_ipca.py`, usando `tests/fixtures/ipca_ultimos_3.json` e as regras de `contracts/ipca-sgs.md`
+- [x] T003 [P] [US1] Teste de integração do fluxo completo (checar → notificar → gravar estado) em `tests/integration/test_fluxo_ipca.py`, com API mockada a partir da fixture
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] Implementar `src/ipca/cliente_sgs.py`: cliente HTTP para `bcdata.sgs.433/dados/ultimos/2` (usa `src/comum/http_retry.py`), convertendo `data`/`valor` conforme `contracts/ipca-sgs.md`, retornando o `DivulgacaoIpca` do mês mais recente
-- [ ] T005 [US1] Implementar `src/ipca/fluxo.py`: orquestra checagem (T004) → verificação de idempotência (mês já processado?) → montagem da mensagem → envio via `enviar_mensagem` → gravação de estado (chave `ultimo_ipca`) SOMENTE após confirmação de envio bem-sucedido
-- [ ] T006 [US1] Implementar gravação de histórico em `historico/ipca/<mes_referencia>.json` a cada mês processado com sucesso, em `src/ipca/fluxo.py`
+- [x] T004 [US1] Implementar `src/ipca/cliente_sgs.py`: cliente HTTP para `bcdata.sgs.433/dados/ultimos/2` (usa `src/comum/http_retry.py`), convertendo `data`/`valor` conforme `contracts/ipca-sgs.md`, retornando o `DivulgacaoIpca` do mês mais recente
+- [x] T005 [US1] Implementar `src/ipca/fluxo.py`: orquestra checagem (T004) → verificação de idempotência (mês já processado?) → montagem da mensagem → envio via `enviar_mensagem` → gravação de estado (chave `ultimo_ipca`) SOMENTE após confirmação de envio bem-sucedido
+- [x] T006 [US1] Implementar gravação de histórico em `historico/ipca/<mes_referencia>.json` a cada mês processado com sucesso, em `src/ipca/fluxo.py`
 
 **Checkpoint**: User Story 1 completa — MVP do fluxo IPCA.
 
@@ -67,12 +67,12 @@ Projeto único: `src/ipca/` (novo), `src/comum/` (reaproveitado do fluxo 001), `
 
 ### Tests for User Story 2
 
-- [ ] T007 [P] [US2] Testes unitários da regra de leitura de impacto em `tests/unit/test_leitura_impacto.py`: `acelerou`/`desacelerou`/`estavel` vs. mês anterior; `acima`/`abaixo`/`em_linha` vs. meta
+- [x] T007 [P] [US2] Testes unitários da regra de leitura de impacto em `tests/unit/test_leitura_impacto.py`: `acelerou`/`desacelerou`/`estavel` vs. mês anterior; `acima`/`abaixo`/`em_linha` vs. meta
 
 ### Implementation for User Story 2
 
-- [ ] T008 [US2] Implementar `src/ipca/leitura_impacto.py`: constante `META_INFLACAO_CENTRO` e função `gerar_leitura(mes_anterior, mes_atual)` retornando `LeituraImpactoIpca` (data-model.md), sem LLM (FR-009)
-- [ ] T009 [US2] Integrar `leitura_impacto.py` (T008) à montagem da mensagem em `src/ipca/fluxo.py` (T005)
+- [x] T008 [US2] Implementar `src/ipca/leitura_impacto.py`: constante `META_INFLACAO_CENTRO` e função `gerar_leitura(mes_anterior, mes_atual)` retornando `LeituraImpactoIpca` (data-model.md), sem LLM (FR-009)
+- [x] T009 [US2] Integrar `leitura_impacto.py` (T008) à montagem da mensagem em `src/ipca/fluxo.py` (T005)
 
 **Checkpoint**: Notificação completa (número + leitura de impacto) na mesma mensagem, conforme FR-003/SC-003.
 
@@ -86,11 +86,11 @@ Projeto único: `src/ipca/` (novo), `src/comum/` (reaproveitado do fluxo 001), `
 
 ### Tests for User Story 3
 
-- [ ] T010 [P] [US3] Teste de integração de falha isolada em `tests/integration/test_fluxo_ipca.py`: exceção durante checagem → `estado.json` inalterado; `_executar_isolado` captura a exceção sem propagar
+- [x] T010 [P] [US3] Teste de integração de falha isolada em `tests/integration/test_fluxo_ipca.py`: exceção durante checagem → `estado.json` inalterado; `_executar_isolado` captura a exceção sem propagar
 
 ### Implementation for User Story 3
 
-- [ ] T011 [US3] Envolver a chamada ao fluxo IPCA em `src/main.py` com `_executar_isolado`, passando `IPCA_TELEGRAM_BOT_TOKEN`/`IPCA_TELEGRAM_CHAT_ID` para `notificar_falha` (reaproveita o mesmo padrão do fluxo Focus)
+- [x] T011 [US3] Envolver a chamada ao fluxo IPCA em `src/main.py` com `_executar_isolado`, passando `IPCA_TELEGRAM_BOT_TOKEN`/`IPCA_TELEGRAM_CHAT_ID` para `notificar_falha` (reaproveita o mesmo padrão do fluxo Focus)
 
 **Checkpoint**: Todas as três user stories do fluxo IPCA funcionam de forma independente e isolada.
 
@@ -98,10 +98,10 @@ Projeto único: `src/ipca/` (novo), `src/comum/` (reaproveitado do fluxo 001), `
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T012 [P] Criar workflow do GitHub Actions (`.github/workflows/ipca.yml`) que roda `src/main.py` em cron diário, injetando `IPCA_TELEGRAM_BOT_TOKEN`/`IPCA_TELEGRAM_CHAT_ID` via GitHub Secrets
-- [ ] T013 Rodar os cenários de `quickstart.md` (via suíte automatizada, mesmo padrão do fluxo Focus)
+- [x] T012 [P] Adicionar `IPCA_TELEGRAM_BOT_TOKEN`/`IPCA_TELEGRAM_CHAT_ID` ao workflow único do GitHub Actions (`.github/workflows/monitor.yml`, consolidado com o fluxo Focus — um workflow único chama `src/main.py`, que já isola os dois fluxos entre si; dois workflows separados chamando `src/main.py` duplicariam a execução de ambos os fluxos)
+- [x] T013 Rodar os cenários de `quickstart.md` (via suíte automatizada, mesmo padrão do fluxo Focus)
 - [ ] T014 Rodar o cenário 5 de `quickstart.md` (chamada real à série 433) — pendente de ambiente com acesso de rede real
-- [ ] T015 [P] Revisar logs/mensagens de erro deste fluxo para confirmar que nenhum token aparece em texto plano (já coberto por `_url_sanitizada`, criada no fluxo Focus — confirmar que se aplica aqui também, já que reaproveita `src/comum/http_retry.py`)
+- [x] T015 [P] Revisar logs/mensagens de erro deste fluxo para confirmar que nenhum token aparece em texto plano (já coberto por `_url_sanitizada`, criada no fluxo Focus — confirmar que se aplica aqui também, já que reaproveita `src/comum/http_retry.py`)
 
 ---
 
