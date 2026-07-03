@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous (except the 2 flagged below)
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,10 +31,8 @@
 
 ## Notes
 
-- 2 open [NEEDS CLARIFICATION] markers remain in FR-004 and FR-011, both
-  about the precise definition of "relevant change" and which Focus
-  statistic (median vs. mean, etc.) is the source of truth. These are
-  scope-defining decisions with no safe default per project principles —
-  resolve via `/speckit-clarify` before `/speckit-plan`.
-- Items marked incomplete require spec updates before `/speckit-clarify` or
-  `/speckit-plan`.
+- Both clarifications (Focus statistic = median; "relevant change" = every
+  new release, with subiu/desceu/manteve comparison in the message text)
+  were resolved directly with the user on 2026-07-03 and encoded into the
+  spec's Clarifications section and FR-004/FR-004a/FR-005/FR-008/FR-011.
+- All checklist items pass. Spec is ready for `/speckit-plan`.
