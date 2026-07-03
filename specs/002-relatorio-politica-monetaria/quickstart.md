@@ -2,16 +2,12 @@
 
 ## Pré-requisitos
 
-- Python 3.12 instalado.
-- Payload real do dataset fornecido, `contracts/relatorio-dataset.md`
-  preenchido, e decisão PDF-vs-estruturado tomada (bloqueios do Princípio
-  II resolvidos) — sem isso, só os cenários 1–3 abaixo (fixtures
-  simuladas, sem extração de conteúdo real) podem ser executados.
+- Python 3.12 instalado, com `anthropic` no `requirements.txt`.
 - Bot do Telegram dedicado ao fluxo Relatório criado, com
   `RELATORIO_TELEGRAM_BOT_TOKEN` e `RELATORIO_TELEGRAM_CHAT_ID`
   disponíveis como variáveis de ambiente locais.
-- Se a decisão de research.md exigir LLM: chave de API correspondente
-  disponível localmente para teste (nunca commitada).
+- `ANTHROPIC_API_KEY` disponível localmente para o cenário 4 (chamada real
+  à Claude API com PDF) — nunca commitada.
 
 ## Cenários de validação (sem depender do contrato real)
 
@@ -32,10 +28,10 @@
      enviada; a falha de análise é tratada como falha isolada (aviso ao
      bot do fluxo Relatório), sem impedir os outros dois fluxos.
 
-## Cenário com dataset/conteúdo real (após contrato e decisão resolvidos)
+## Cenário com dataset/API real
 
-4. **Chamada real ao dataset e extração do conteúdo**
-   - Rodar `src/relatorio/cliente_dataset.py` e `src/relatorio/extrator_conteudo.py`
-     contra os dados reais e confirmar que a sequência completa de 4
-     mensagens é gerada corretamente para o relatório mais recente
-     publicado.
+4. **Chamada real ao dataset e à Claude API**
+   - Rodar `src/relatorio/cliente_dataset.py` e `src/relatorio/gerador_analise.py`
+     contra os dados reais (dataset + PDF + Claude API) e confirmar que a
+     sequência completa de 4 mensagens é gerada corretamente para o
+     relatório mais recente publicado.

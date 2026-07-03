@@ -2,56 +2,52 @@
 
 ## R1 — Formato do payload do dataset de Relatórios de Política Monetária
 
-- **Status**: 🔴 **BLOQUEADO — aguardando payload real.**
-- **Decision**: Nenhuma. Por Princípio II, este projeto não escreve
-  cliente HTTP nem parser a partir de documentação pública/terceiros. O
-  dataset candidato levantado por pesquisa pública é
-  `relatorios-de-inflacao-publicados`, no Portal de Dados Abertos do BCB
-  (`dadosabertos.bcb.gov.br`), mas isso é apenas uma hipótese de onde
-  consultar.
-- **Ação necessária**: pedir ao usuário para:
-  1. Abrir o dataset no Portal de Dados Abertos do BCB
-     (`https://dadosabertos.bcb.gov.br/dataset/relatorios-de-inflacao-publicados`)
-     e colar a URL real de acesso aos dados (a página do dataset costuma
-     expor um link de API/recurso, formato CSV/JSON/API).
-  2. Fazer a chamada de teste a esse link e colar a resposta real.
+- **Status**: ✅ Resolvido em 2026-07-03, via chamada de teste real.
+- **Decision**: endpoint
+  `https://www.bcb.gov.br/api/servico/sitebcb/ri/relatorios?quantidade=N`,
+  campos `identificador`, `dataReferencia`, `url` (PDF), `linkPaginaBC`,
+  `edicao`, `volume`. Schema completo em `contracts/relatorio-dataset.md`.
+- **Rationale**: confirmado por chamada real
+  (`quantidade=5` → lista de 5 relatórios, do mais recente ao mais antigo),
+  nunca assumido a partir de documentação de terceiros. O usuário também
+  colou o texto da página do dataset, que confirma oficialmente (fonte
+  primária do BCB) que o relatório "é distribuído como um documento PDF".
+- **Alternatives considered**: N/A.
 
 ## R2 — Conteúdo do relatório: PDF ou estruturado?
 
-- **Status**: 🔴 **BLOQUEADO — depende de R1.**
-- **Decision**: Nenhuma ainda. Por instrução explícita do usuário, esta
-  decisão só pode ser tomada via `/speckit-clarify` depois que o payload
-  de R1 mostrar se o dataset expõe apenas um link de PDF ou também
-  conteúdo estruturado (texto, seções, tabelas de projeção).
-- **Cenários possíveis a decidir quando o payload chegar**:
-  - Se houver conteúdo estruturado (ex.: texto das seções, tabela de
-    projeções em formato de dados): parsear diretamente, sem LLM
-    necessariamente.
-  - Se houver apenas um link de PDF: decidir entre (a) extrair texto bruto
-    do PDF com uma biblioteca simples e resumir via LLM, ou (b) não tentar
-    extrair automaticamente e enviar apenas o aviso de publicação com link
-    (reduzindo a User Story 2 a um nível mais básico), ou (c) outra
-    abordagem a discutir.
-- **Ação necessária**: nenhuma adicional além de R1 — a decisão é tomada
-  no mesmo momento, com o mesmo payload.
+- **Status**: ✅ Resolvido em 2026-07-03 — **é só PDF**, confirmado tanto
+  pelo payload real (nenhum campo de texto estruturado, só metadados e
+  `url` do PDF) quanto pela descrição oficial da página do dataset.
+- **Decision**: o conteúdo da análise crítica (User Story 2) precisa
+  processar o PDF diretamente — não há atalho estruturado.
 
 ## R3 — Mecanismo de geração da análise crítica (LLM ou não)
 
-- **Status**: 🟡 Depende de R2.
-- **Decision**: adiada. Se R2 concluir que há conteúdo estruturado
-  suficiente, uma regra determinística pode bastar (como decidido para o
-  fluxo IPCA). Se depender de interpretar texto corrido (PDF ou seções
-  longas), um LLM é o caminho mais plausível, reaproveitando o padrão já
-  validado no copom-monitor-pm para análise de Ata — mas isso introduz uma
-  nova chave de API (`ANTHROPIC_API_KEY` ou similar) como GitHub Secret,
-  compartilhada entre os fluxos que precisarem de LLM (não é um "bot"
-  então não conflita com o Princípio IV de bot dedicado por fluxo).
-- **Ação necessária**: nenhuma adicional além de R1/R2.
+- **Status**: ✅ Resolvido em 2026-07-03, via decisão do usuário.
+- **Decision**: baixar os bytes do PDF (a partir do campo `url`) e enviá-los
+  diretamente como bloco de documento em uma chamada à API da Anthropic
+  (Claude), que tem suporte nativo à leitura de PDF — **sem nenhuma
+  biblioteca de extração de texto de PDF** (`pypdf` ou similar).
+- **Rationale**: elimina uma dependência inteira (parser de PDF) mantendo
+  a mesma simplicidade de dependências do projeto (Princípio VII);
+  reaproveita o padrão de análise via LLM já validado no copom-monitor-pm
+  para Atas, adaptado para receber um documento em vez de texto puro.
+  Novo segredo necessário: `ANTHROPIC_API_KEY` (GitHub Secret — não é um
+  "bot" do Telegram, então não conflita com o Princípio IV).
+- **Alternatives considered**:
+  - Extrair texto do PDF localmente com `pypdf` e enviar texto puro ao
+    LLM — rejeitada por introduzir uma dependência a mais sem necessidade,
+    já que a Claude API lê PDF nativamente.
+  - Não tentar análise automática, só aviso + link — rejeitada pelo
+    usuário; a análise crítica é o valor central da User Story 2.
+
+## R4 — Chave de idempotência
+
+- **Status**: ✅ Resolvido — `identificador` (`"YYYYMM"`), mais simples e
+  estável que derivar de `dataReferencia`.
 
 ## Resumo de bloqueios para a Phase 1
 
-R1 e R2 (e por consequência R3) bloqueiam a conclusão de
-`contracts/relatorio-dataset.md` e de `data-model.md`/`quickstart.md` na
-parte que depende do mecanismo de extração/análise. As partes de negócio
-puramente estruturais (ex.: chave de estado, fallback de FR-006) podem ser
-descritas em termos conceituais desde já.
+Nenhum bloqueio restante. R1–R4 resolvidos com payload real e decisão do
+usuário em 2026-07-03; `contracts/relatorio-dataset.md` está completo.
