@@ -65,10 +65,9 @@ def processar():
     except Exception as exc:
         # Fallback FR-006: falha na análise não impede que o relatório seja
         # considerado processado, já que o aviso de publicação foi enviado.
-        logger.error(
-            "Falha ao gerar/enviar análise crítica (aviso já enviado): %s",
-            _sanitizar(str(exc), token),
-        )
+        mensagem_erro = _sanitizar(str(exc), token)
+        mensagem_erro = _sanitizar(mensagem_erro, os.environ.get("ANTHROPIC_API_KEY"))
+        logger.error("Falha ao gerar/enviar análise crítica (aviso já enviado): %s", mensagem_erro)
 
     gravar_estado(CHAVE_ESTADO, {"identificador": atual.identificador}, caminho=ESTADO_PATH)
     _gravar_historico(atual, analise_gerada)

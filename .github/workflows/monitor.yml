@@ -29,6 +29,7 @@ jobs:
           IPCA_TELEGRAM_CHAT_ID: ${{ secrets.IPCA_TELEGRAM_CHAT_ID }}
           RELATORIO_TELEGRAM_BOT_TOKEN: ${{ secrets.RELATORIO_TELEGRAM_BOT_TOKEN }}
           RELATORIO_TELEGRAM_CHAT_ID: ${{ secrets.RELATORIO_TELEGRAM_CHAT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python -m src.main
 
       - name: Commitar estado e histórico atualizados

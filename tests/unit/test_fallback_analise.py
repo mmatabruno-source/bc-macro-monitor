@@ -39,3 +39,21 @@ def test_falha_no_download_do_pdf_ainda_marca_processado(estado_path):
 
     dados = json.loads(estado_path.read_text())
     assert dados["ultimo_relatorio"]["identificador"] == "202412"
+
+
+def test_chave_anthropic_nunca_aparece_em_log_de_falha(estado_path, monkeypatch, caplog):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-segredo-123")
+    atual = RelatorioPoliticaMonetaria(
+        identificador="202412",
+        data_publicacao="2024-12-19",
+        link_pdf="https://exemplo.com/relatorio.pdf",
+        link_pagina="https://exemplo.com/pagina",
+    )
+
+    with patch("src.relatorio.fluxo.buscar_relatorio_mais_recente", return_value=atual), \
+         patch("src.relatorio.fluxo.gerar_analise", side_effect=RuntimeError("falha com chave sk-ant-segredo-123 no meio")), \
+         patch("src.relatorio.fluxo.enviar_mensagem"), \
+         caplog.at_level("ERROR"):
+        processar()
+
+    assert "sk-ant-segredo-123" not in caplog.text
