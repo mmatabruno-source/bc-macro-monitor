@@ -24,8 +24,8 @@ Projeto único: `src/relatorio/` (novo), `src/comum/` (reaproveitado), `tests/`,
 
 ## Phase 1: Setup
 
-- [ ] T001 Criar diretório `historico/relatorios/` (com `.gitkeep`)
-- [ ] T002 [P] Adicionar `anthropic` ao `requirements.txt` (já feito) e instalar
+- [x] T001 Criar diretório `historico/relatorios/` (com `.gitkeep`)
+- [x] T002 [P] Adicionar `anthropic` ao `requirements.txt` (já feito) e instalar
 
 **Checkpoint**: `src/comum/` já existe do fluxo 001 — nenhuma infraestrutura nova bloqueante.
 
@@ -47,14 +47,14 @@ Projeto único: `src/relatorio/` (novo), `src/comum/` (reaproveitado), `tests/`,
 
 ### Tests for User Story 1
 
-- [ ] T003 [P] [US1] Contract test do parser do dataset em `tests/contract/test_contrato_relatorio.py`, usando `tests/fixtures/relatorios_quantidade_5.json` e as regras de `contracts/relatorio-dataset.md`
-- [ ] T004 [P] [US1] Teste de integração do aviso de publicação (sem análise) em `tests/integration/test_fluxo_relatorio.py`, com dataset mockado a partir da fixture
+- [x] T003 [P] [US1] Contract test do parser do dataset em `tests/contract/test_contrato_relatorio.py`, usando `tests/fixtures/relatorios_quantidade_5.json` e as regras de `contracts/relatorio-dataset.md`
+- [x] T004 [P] [US1] Teste de integração do aviso de publicação (sem análise) em `tests/integration/test_fluxo_relatorio.py`, com dataset mockado a partir da fixture
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] Implementar `src/relatorio/cliente_dataset.py`: cliente HTTP para `sitebcb/ri/relatorios?quantidade=N` (usa `src/comum/http_retry.py`), retornando o `RelatorioPoliticaMonetaria` mais recente (primeiro elemento de `conteudo`)
-- [ ] T006 [US1] Implementar `src/relatorio/fluxo.py` (esqueleto): checagem (T005) → verificação de idempotência por `identificador` → envio do aviso de publicação (`linkPaginaBC`) → gravação de estado (chave `ultimo_relatorio`) SOMENTE após confirmação de envio bem-sucedido
-- [ ] T007 [US1] Implementar gravação de histórico em `historico/relatorios/<identificador>.json` a cada relatório processado com sucesso
+- [x] T005 [US1] Implementar `src/relatorio/cliente_dataset.py`: cliente HTTP para `sitebcb/ri/relatorios?quantidade=N` (usa `src/comum/http_retry.py`), retornando o `RelatorioPoliticaMonetaria` mais recente (primeiro elemento de `conteudo`)
+- [x] T006 [US1] Implementar `src/relatorio/fluxo.py` (esqueleto): checagem (T005) → verificação de idempotência por `identificador` → envio do aviso de publicação (`linkPaginaBC`) → gravação de estado (chave `ultimo_relatorio`) SOMENTE após confirmação de envio bem-sucedido
+- [x] T007 [US1] Implementar gravação de histórico em `historico/relatorios/<identificador>.json` a cada relatório processado com sucesso
 
 **Checkpoint**: User Story 1 completa — MVP do fluxo Relatório (aviso + link, sem análise ainda).
 
@@ -68,14 +68,14 @@ Projeto único: `src/relatorio/` (novo), `src/comum/` (reaproveitado), `tests/`,
 
 ### Tests for User Story 2
 
-- [ ] T008 [P] [US2] Teste unitário de `gerador_analise.py` em `tests/unit/test_gerador_analise.py`, mockando a chamada à Claude API e verificando que `AnaliseCritica` é montada a partir da resposta
-- [ ] T009 [P] [US2] Teste de integração da sequência completa de 4 mensagens em `tests/integration/test_fluxo_relatorio.py` (mesma suíte de T004), com Claude API mockada com sucesso
-- [ ] T010 [P] [US2] Teste unitário do fallback (FR-006) em `tests/unit/test_fallback_analise.py`: análise falha → apenas mensagem de aviso é enviada, sem interromper o fluxo
+- [x] T008 [P] [US2] Teste unitário de `gerador_analise.py` em `tests/unit/test_gerador_analise.py`, mockando a chamada à Claude API e verificando que `AnaliseCritica` é montada a partir da resposta
+- [x] T009 [P] [US2] Teste de integração da sequência completa de 4 mensagens em `tests/integration/test_fluxo_relatorio.py` (mesma suíte de T004), com Claude API mockada com sucesso
+- [x] T010 [P] [US2] Teste unitário do fallback (FR-006) em `tests/unit/test_fallback_analise.py`: análise falha → apenas mensagem de aviso é enviada, sem interromper o fluxo
 
 ### Implementation for User Story 2
 
-- [ ] T011 [US2] Implementar `src/relatorio/gerador_analise.py`: baixa os bytes do PDF (`requests`, via `src/comum/http_retry.py`) a partir de `url`, monta uma chamada à Claude API (`anthropic`) com o PDF como bloco de documento, prompt pedindo cenário macro / projeções / implicação para portfólio como 3 seções distintas, e retorna `AnaliseCritica`
-- [ ] T012 [US2] Estender `src/relatorio/fluxo.py` (T006): após o aviso de publicação, tentar gerar a análise (T011); se bem-sucedida, enviar as 3 mensagens adicionais na ordem definida em `data-model.md`; se falhar, capturar a exceção, logar e seguir sem interromper (o relatório já é considerado processado pelo aviso enviado com sucesso)
+- [x] T011 [US2] Implementar `src/relatorio/gerador_analise.py`: baixa os bytes do PDF (`requests`, via `src/comum/http_retry.py`) a partir de `url`, monta uma chamada à Claude API (`anthropic`) com o PDF como bloco de documento, prompt pedindo cenário macro / projeções / implicação para portfólio como 3 seções distintas, e retorna `AnaliseCritica`
+- [x] T012 [US2] Estender `src/relatorio/fluxo.py` (T006): após o aviso de publicação, tentar gerar a análise (T011); se bem-sucedida, enviar as 3 mensagens adicionais na ordem definida em `data-model.md`; se falhar, capturar a exceção, logar e seguir sem interromper (o relatório já é considerado processado pelo aviso enviado com sucesso)
 
 **Checkpoint**: Notificação completa (4 mensagens) quando a análise funciona; fallback gracioso quando não funciona.
 
@@ -89,11 +89,11 @@ Projeto único: `src/relatorio/` (novo), `src/comum/` (reaproveitado), `tests/`,
 
 ### Tests for User Story 3
 
-- [ ] T013 [P] [US3] Teste de integração de falha isolada em `tests/integration/test_fluxo_relatorio.py`: exceção durante a checagem do dataset → `estado.json` inalterado; `_executar_isolado` captura sem propagar
+- [x] T013 [P] [US3] Teste de integração de falha isolada em `tests/integration/test_fluxo_relatorio.py`: exceção durante a checagem do dataset → `estado.json` inalterado; `_executar_isolado` captura sem propagar
 
 ### Implementation for User Story 3
 
-- [ ] T014 [US3] Envolver a chamada ao fluxo Relatório em `src/main.py` com `_executar_isolado`, passando `RELATORIO_TELEGRAM_BOT_TOKEN`/`RELATORIO_TELEGRAM_CHAT_ID` para `notificar_falha` (reaproveita o mesmo padrão dos fluxos Focus/IPCA)
+- [x] T014 [US3] Envolver a chamada ao fluxo Relatório em `src/main.py` com `_executar_isolado`, passando `RELATORIO_TELEGRAM_BOT_TOKEN`/`RELATORIO_TELEGRAM_CHAT_ID` para `notificar_falha` (reaproveita o mesmo padrão dos fluxos Focus/IPCA)
 
 **Checkpoint**: Todas as três user stories do fluxo Relatório funcionam de forma independente e isolada.
 
@@ -101,10 +101,10 @@ Projeto único: `src/relatorio/` (novo), `src/comum/` (reaproveitado), `tests/`,
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T015 [P] Adicionar `RELATORIO_TELEGRAM_BOT_TOKEN`/`RELATORIO_TELEGRAM_CHAT_ID` e `ANTHROPIC_API_KEY` ao workflow único `.github/workflows/monitor.yml`
-- [ ] T016 Rodar os cenários 1–3 de `quickstart.md` via suíte automatizada
+- [x] T015 [P] Adicionar `RELATORIO_TELEGRAM_BOT_TOKEN`/`RELATORIO_TELEGRAM_CHAT_ID` e `ANTHROPIC_API_KEY` ao workflow único `.github/workflows/monitor.yml`
+- [x] T016 Rodar os cenários 1–3 de `quickstart.md` via suíte automatizada
 - [ ] T017 Rodar o cenário 4 de `quickstart.md` (chamada real ao dataset + PDF + Claude API) — pendente de ambiente com rede real e `ANTHROPIC_API_KEY` válida
-- [ ] T018 [P] Revisar logs/mensagens de erro deste fluxo para confirmar que nenhum token/chave aparece em texto plano (reaproveita `_url_sanitizada`; adicionar sanitização equivalente para `ANTHROPIC_API_KEY` se ela aparecer em alguma URL ou header logado)
+- [x] T018 [P] Revisar logs/mensagens de erro deste fluxo para confirmar que nenhum token/chave aparece em texto plano (reaproveita `_url_sanitizada`; adicionar sanitização equivalente para `ANTHROPIC_API_KEY` se ela aparecer em alguma URL ou header logado)
 
 ---
 
