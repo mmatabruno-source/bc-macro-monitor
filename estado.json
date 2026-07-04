@@ -1,1 +1,9 @@
-{}
+{
+  "ultimo_ipca": {
+    "mes_referencia": "2026-05",
+    "variacao_mensal": 0.58
+  },
+  "ultimo_relatorio": {
+    "identificador": "202412"
+  }
+}
