@@ -26,6 +26,20 @@ GRUPOS_FAKE = [
 ]
 
 
+def _serie_13_meses(valor_mes_ano_anterior=0.44):
+    """13 meses consecutivos, 2025-05 (mais antigo) até 2026-05 (atual),
+    na ordem esperada da API (mais antigo primeiro)."""
+    divulgacoes = [DivulgacaoIpca(mes_referencia="2025-05", variacao_mensal=valor_mes_ano_anterior)]
+    for mes in range(6, 13):
+        divulgacoes.append(DivulgacaoIpca(mes_referencia=f"2025-{mes:02d}", variacao_mensal=0.5))
+    for mes in range(1, 4):
+        divulgacoes.append(DivulgacaoIpca(mes_referencia=f"2026-{mes:02d}", variacao_mensal=0.5))
+    divulgacoes.append(DivulgacaoIpca(mes_referencia="2026-04", variacao_mensal=0.67))
+    divulgacoes.append(DivulgacaoIpca(mes_referencia="2026-05", variacao_mensal=0.58))
+    assert len(divulgacoes) == 13
+    return divulgacoes
+
+
 def test_primeiro_mes_notifica(estado_path):
     anterior = DivulgacaoIpca(mes_referencia="2026-04", variacao_mensal=0.67)
     atual = DivulgacaoIpca(mes_referencia="2026-05", variacao_mensal=0.58)
@@ -47,6 +61,32 @@ def test_primeiro_mes_notifica(estado_path):
 
     dados = json.loads(estado_path.read_text())
     assert dados["ultimo_ipca"]["mes_referencia"] == "2026-05"
+
+
+def test_mostra_mes_do_ano_anterior_quando_disponivel(estado_path):
+    divulgacoes = _serie_13_meses(valor_mes_ano_anterior=0.44)
+
+    with patch("src.ipca.fluxo.buscar_ultimas_divulgacoes", return_value=divulgacoes), \
+         patch("src.ipca.fluxo.buscar_composicao_ipca", return_value=("2026-05", 0.58, GRUPOS_FAKE)), \
+         patch("src.ipca.fluxo.enviar_mensagem") as mock_enviar:
+        processar()
+
+    texto = mock_enviar.call_args.args[0]
+    assert "Mês do ano anterior" in texto
+    assert "0,44" in texto
+
+
+def test_omite_mes_do_ano_anterior_se_api_nao_retornar_13_meses(estado_path):
+    anterior = DivulgacaoIpca(mes_referencia="2026-04", variacao_mensal=0.67)
+    atual = DivulgacaoIpca(mes_referencia="2026-05", variacao_mensal=0.58)
+
+    with patch("src.ipca.fluxo.buscar_ultimas_divulgacoes", return_value=[anterior, atual]), \
+         patch("src.ipca.fluxo.buscar_composicao_ipca", return_value=("2026-05", 0.58, GRUPOS_FAKE)), \
+         patch("src.ipca.fluxo.enviar_mensagem") as mock_enviar:
+        processar()
+
+    texto = mock_enviar.call_args.args[0]
+    assert "Mês do ano anterior" not in texto
 
 
 def test_mesmo_mes_relido_nao_notifica_idempotencia(estado_path):
