@@ -100,7 +100,7 @@ Projeto único: `src/ipca/` (novo), `src/comum/` (reaproveitado do fluxo 001), `
 
 - [x] T012 [P] Adicionar `IPCA_TELEGRAM_BOT_TOKEN`/`IPCA_TELEGRAM_CHAT_ID` ao workflow único do GitHub Actions (`.github/workflows/monitor.yml`, consolidado com o fluxo Focus — um workflow único chama `src/main.py`, que já isola os dois fluxos entre si; dois workflows separados chamando `src/main.py` duplicariam a execução de ambos os fluxos)
 - [x] T013 Rodar os cenários de `quickstart.md` (via suíte automatizada, mesmo padrão do fluxo Focus)
-- [ ] T014 Rodar o cenário 5 de `quickstart.md` (chamada real à série 433) — pendente de ambiente com acesso de rede real
+- [x] T014 Rodar o cenário 5 de `quickstart.md` (chamada real à série 433). **Concluída em 2026-07-04** — validada no primeiro run real do workflow (28693988468, `conclusion: success`): notificação "IPCA 2026-05, variação 0.58%, desacelerou em relação ao mês anterior, acima da meta" recebida corretamente.
 - [x] T015 [P] Revisar logs/mensagens de erro deste fluxo para confirmar que nenhum token aparece em texto plano (já coberto por `_url_sanitizada`, criada no fluxo Focus — confirmar que se aplica aqui também, já que reaproveita `src/comum/http_retry.py`)
 
 ---

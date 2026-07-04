@@ -14,6 +14,7 @@ def estado_path(tmp_path, monkeypatch):
     caminho.write_text("{}")
     monkeypatch.setattr("src.comum.estado.ESTADO_PATH", caminho)
     monkeypatch.setattr("src.ipca.fluxo.ESTADO_PATH", caminho)
+    monkeypatch.setattr("src.ipca.fluxo.HISTORICO_DIR", tmp_path / "historico")
     monkeypatch.setenv("IPCA_TELEGRAM_BOT_TOKEN", "token-fake")
     monkeypatch.setenv("IPCA_TELEGRAM_CHAT_ID", "chat-fake")
     return caminho

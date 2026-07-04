@@ -16,6 +16,7 @@ def estado_path(tmp_path, monkeypatch):
     caminho.write_text("{}")
     monkeypatch.setattr("src.comum.estado.ESTADO_PATH", caminho)
     monkeypatch.setattr("src.relatorio.fluxo.ESTADO_PATH", caminho)
+    monkeypatch.setattr("src.relatorio.fluxo.HISTORICO_DIR", tmp_path / "historico")
     monkeypatch.setenv("RELATORIO_TELEGRAM_BOT_TOKEN", "token-fake")
     monkeypatch.setenv("RELATORIO_TELEGRAM_CHAT_ID", "chat-fake")
     return caminho

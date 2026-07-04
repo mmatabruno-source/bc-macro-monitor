@@ -103,7 +103,7 @@ Projeto único: `src/relatorio/` (novo), `src/comum/` (reaproveitado), `tests/`,
 
 - [x] T015 [P] Adicionar `RELATORIO_TELEGRAM_BOT_TOKEN`/`RELATORIO_TELEGRAM_CHAT_ID` e `ANTHROPIC_API_KEY` ao workflow único `.github/workflows/monitor.yml`
 - [x] T016 Rodar os cenários 1–3 de `quickstart.md` via suíte automatizada
-- [ ] T017 Rodar o cenário 4 de `quickstart.md` (chamada real ao dataset + PDF + Claude API) — pendente de ambiente com rede real e `ANTHROPIC_API_KEY` válida
+- [ ] T017 Rodar o cenário 4 de `quickstart.md` (chamada real ao dataset + PDF + Claude API). **Parcialmente validada em 2026-07-04**: a chamada ao dataset funcionou em produção (aviso de publicação do relatório 202412 recebido com sucesso, `estado.json` gravado). A parte da análise via Claude API (cenário/projeções/portfólio) ainda não foi validada — `ANTHROPIC_API_KEY` ainda não foi cadastrado como Secret pelo usuário; o fallback (FR-006) está funcionando como esperado nesse meio-tempo (só o aviso é enviado). Reabrir esta tarefa depois que o secret for adicionado.
 - [x] T018 [P] Revisar logs/mensagens de erro deste fluxo para confirmar que nenhum token/chave aparece em texto plano (reaproveita `_url_sanitizada`; adicionar sanitização equivalente para `ANTHROPIC_API_KEY` se ela aparecer em alguma URL ou header logado)
 
 ---
