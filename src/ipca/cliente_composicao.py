@@ -1,8 +1,13 @@
-"""Cliente HTTP da tabela SIDRA 7060 do IBGE (composição do IPCA por grupo).
+"""Cliente HTTP da API de Agregados (v3) do IBGE, tabela 7060 (composição do
+IPCA por grupo).
 
 Não existe API do BC com essa abertura (só a variação geral, série SGS 433)
-— quem calcula e publica a composição por grupo, com peso, é o IBGE, via
-SIDRA. Ver https://sidra.ibge.gov.br/tabela/7060.
+— quem calcula e publica a composição por grupo, com peso, é o IBGE.
+
+Usa servicodados.ibge.gov.br (API v3), não apisidra.ibge.gov.br: o domínio
+apisidra dá connect timeout a partir de IPs de datacenter (confirmado em
+teste real no GitHub Actions — funciona de IP residencial, mas não daqui),
+enquanto servicodados respondeu normalmente (200, ~1s).
 """
 
 from src.comum.http_retry import requisitar_com_retry
@@ -23,7 +28,10 @@ CODIGOS_GRUPOS = {
     "7786": "Comunicação",
 }
 
-BASE_URL = "https://apisidra.ibge.gov.br/values/t/7060/n1/all/v/63,66/p/last%201/c315/{codigos}"
+BASE_URL = (
+    "https://servicodados.ibge.gov.br/api/v3/agregados/7060/periodos/-1/"
+    "variaveis/63|66?localidades=N1[all]&classificacao=315[{codigos}]"
+)
 
 
 def _parse_mes_referencia(codigo_periodo):
@@ -32,14 +40,20 @@ def _parse_mes_referencia(codigo_periodo):
 
 
 def _parse_payload(payload):
-    """Recebe o payload bruto da SIDRA (com cabeçalho na primeira posição) e
-    retorna (mes_referencia, variacao_indice_geral, [GrupoIpca, ...])."""
-    linhas = payload[1:]  # primeira linha é o cabeçalho de colunas
-
-    mes_referencia = _parse_mes_referencia(linhas[0]["D3C"])
+    """Recebe o payload bruto da API v3 (uma entrada por variável, cada uma
+    com um resultado por classificação/grupo) e retorna
+    (mes_referencia, variacao_indice_geral, [GrupoIpca, ...])."""
     valores = {}
-    for linha in linhas:
-        valores.setdefault(linha["D4C"], {})[linha["D2C"]] = float(linha["V"])
+    mes_referencia = None
+
+    for variavel in payload:
+        var_id = variavel["id"]
+        for resultado in variavel["resultados"]:
+            codigo = next(iter(resultado["classificacoes"][0]["categoria"]))
+            serie = resultado["series"][0]["serie"]
+            codigo_periodo, valor = next(iter(serie.items()))
+            mes_referencia = _parse_mes_referencia(codigo_periodo)
+            valores.setdefault(codigo, {})[var_id] = float(valor)
 
     variacao_indice_geral = valores[CODIGO_INDICE_GERAL]["63"]
     grupos = [
@@ -60,6 +74,6 @@ def buscar_composicao_ipca():
     codigos = ",".join([CODIGO_INDICE_GERAL] + list(CODIGOS_GRUPOS))
     url = BASE_URL.format(codigos=codigos)
 
-    resposta = requisitar_com_retry("GET", url, params={"formato": "json"}, timeout=20)
+    resposta = requisitar_com_retry("GET", url, timeout=20)
     resposta.raise_for_status()
     return _parse_payload(resposta.json())
