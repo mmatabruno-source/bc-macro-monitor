@@ -8,38 +8,46 @@ from pathlib import Path
 
 from src.comum.estado import ESTADO_PATH, gravar_estado, ler_estado
 from src.comum.telegram import _sanitizar, enviar_mensagem
+from src.focus.calendario_copom import formatar_periodo_reuniao
 from src.focus.cliente_expectativas import buscar_proxima_reuniao
-from src.focus.comparador import DivulgacaoFocus, comparar
+from src.focus.cliente_selic_atual import buscar_selic_vigente
+from src.focus.comparador import DivulgacaoFocus, calcular_variacao
 
 logger = logging.getLogger(__name__)
 
 CHAVE_ESTADO = "ultima_expectativa_copom"
 HISTORICO_DIR = Path(__file__).resolve().parent.parent.parent / "historico" / "focus"
 
-TEXTO_DIRECAO = {
-    "subiu": "subiu",
-    "desceu": "desceu",
-    "manteve": "manteve",
-    "inicial": "valor inicial (sem divulgação anterior para comparar)",
-}
+
+def _fmt_pp(valor):
+    texto = f"{valor:+.2f}".replace(".", ",")
+    return f"{texto}p.p."
 
 
-def _montar_mensagem(anterior, atual, direcao):
-    linhas = [
-        f"📊 Focus — expectativa de Selic para {atual.reuniao_id}",
-        f"Mediana: {atual.mediana_selic}",
-        f"Direção: {TEXTO_DIRECAO[direcao]}",
-    ]
-    if anterior is not None and direcao != "inicial":
-        linhas.append(f"Mediana anterior: {anterior.mediana_selic}")
-    return "\n".join(linhas)
+def _fmt_pct(valor):
+    return f"{valor:.2f}".replace(".", ",")
 
 
-def _gravar_historico(divulgacao):
+def _montar_mensagem(atual, selic_vigente):
+    variacao, emoji = calcular_variacao(selic_vigente, atual.mediana_selic)
+    periodo = formatar_periodo_reuniao(atual.reuniao_id)
+    return "\n".join([
+        f"📢 Boletim Focus ({atual.data_referencia})",
+        "",
+        f"{emoji} O Focus projeta uma variação de {_fmt_pp(variacao)} na Selic",
+        f"▪️ Antes: {_fmt_pct(selic_vigente)}% a.a.",
+        f"▪️ Depois: {_fmt_pct(atual.mediana_selic)}% a.a. (mediana)",
+        f"▪️ Próxima reunião: {periodo}",
+    ])
+
+
+def _gravar_historico(divulgacao, selic_vigente):
     HISTORICO_DIR.mkdir(parents=True, exist_ok=True)
     caminho = HISTORICO_DIR / f"{divulgacao.data_referencia}.json"
+    dados = asdict(divulgacao)
+    dados["selic_vigente"] = selic_vigente
     caminho.write_text(
-        json.dumps(asdict(divulgacao), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        json.dumps(dados, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
 
@@ -60,8 +68,8 @@ def processar():
         logger.info("Divulgação já processada (%s, %s) — nada a fazer", atual.reuniao_id, atual.data_referencia)
         return False
 
-    direcao = comparar(anterior, atual)
-    mensagem = _montar_mensagem(anterior, atual, direcao)
+    selic_vigente = buscar_selic_vigente()
+    mensagem = _montar_mensagem(atual, selic_vigente)
 
     token = os.environ.get("FOCUS_TELEGRAM_BOT_TOKEN")
     chat_id = os.environ.get("FOCUS_TELEGRAM_CHAT_ID")
@@ -73,6 +81,6 @@ def processar():
         raise
 
     gravar_estado(CHAVE_ESTADO, asdict(atual), caminho=ESTADO_PATH)
-    _gravar_historico(atual)
+    _gravar_historico(atual, selic_vigente)
 
     return True
