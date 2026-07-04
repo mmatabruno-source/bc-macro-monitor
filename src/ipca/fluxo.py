@@ -30,7 +30,7 @@ def _fmt(valor):
 
 def _montar_tabela_grupos(grupos):
     linhas = [f"{'Grupo':<{LARGURA_NOME}}{'Var%':>7}{'Peso%':>7}"]
-    for grupo in grupos:
+    for grupo in sorted(grupos, key=lambda g: g.peso_mensal, reverse=True):
         linhas.append(
             f"{grupo.nome:<{LARGURA_NOME}}{_fmt(grupo.variacao_mensal):>7}{_fmt(grupo.peso_mensal):>7}"
         )
@@ -62,8 +62,8 @@ def _buscar_composicao_com_fallback(mes_referencia_esperado):
 def _montar_mensagem(mes_anterior, atual, grupos):
     leitura = gerar_leitura(mes_anterior, atual)
     linhas = [
-        f"📈 IPCA — {atual.mes_referencia}",
-        f"Variação mensal: {atual.variacao_mensal}%",
+        f"📈 *IPCA — {atual.mes_referencia}*",
+        f"*Variação mensal*: {atual.variacao_mensal}%",
         f"Leitura: {TEXTO_DIRECAO[leitura.direcao_vs_mes_anterior]} em relação ao mês anterior, "
         f"{TEXTO_POSICAO[leitura.posicao_vs_meta]}",
     ]
