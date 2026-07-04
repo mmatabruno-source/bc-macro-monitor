@@ -10,16 +10,13 @@ from src.comum.estado import ESTADO_PATH, gravar_estado, ler_estado
 from src.comum.telegram import _sanitizar, enviar_mensagem
 from src.ipca.cliente_composicao import buscar_composicao_ipca
 from src.ipca.cliente_sgs import buscar_ultimas_divulgacoes
-from src.ipca.leitura_impacto import gerar_leitura
+from src.ipca.leitura_impacto import META_INFLACAO_CENTRO, calcular_variacao_anualizada
 from src.ipca.modelos import DivulgacaoIpca
 
 logger = logging.getLogger(__name__)
 
 CHAVE_ESTADO = "ultimo_ipca"
 HISTORICO_DIR = Path(__file__).resolve().parent.parent.parent / "historico" / "ipca"
-
-TEXTO_DIRECAO = {"acelerou": "acelerou", "desacelerou": "desacelerou", "estavel": "estável"}
-TEXTO_POSICAO = {"acima": "acima da meta", "abaixo": "abaixo da meta", "em_linha": "em linha com a meta"}
 
 LARGURA_NOME = 27
 
@@ -60,12 +57,14 @@ def _buscar_composicao_com_fallback(mes_referencia_esperado):
 
 
 def _montar_mensagem(mes_anterior, atual, grupos):
-    leitura = gerar_leitura(mes_anterior, atual)
+    variacao_anualizada = calcular_variacao_anualizada(atual.variacao_mensal)
     linhas = [
         f"📈 *IPCA — {atual.mes_referencia}*",
-        f"*Variação mensal*: {atual.variacao_mensal}%",
-        f"Leitura: {TEXTO_DIRECAO[leitura.direcao_vs_mes_anterior]} em relação ao mês anterior, "
-        f"{TEXTO_POSICAO[leitura.posicao_vs_meta]}",
+        f"*Variação mensal*: {_fmt(atual.variacao_mensal)}%",
+        f"*Mês anterior*: {_fmt(mes_anterior.variacao_mensal)}%",
+        "",
+        f"*Variação anualizada*: {_fmt(variacao_anualizada)}% a.a.",
+        f"*Meta de inflação*: {_fmt(META_INFLACAO_CENTRO)}% a.a.",
     ]
     if grupos is not None:
         tabela = _montar_tabela_grupos(grupos)
