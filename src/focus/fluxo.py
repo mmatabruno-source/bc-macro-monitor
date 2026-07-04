@@ -35,7 +35,7 @@ def _montar_mensagem(atual, selic_vigente):
     return "\n".join([
         f"📢 Boletim Focus ({atual.data_referencia})",
         "",
-        f"{emoji} O Mercado Financeiro projeta uma *variação de {_fmt_pp(variacao)}* na Selic",
+        f"{emoji} Projeta-se uma *variação de {_fmt_pp(variacao)}* na Selic",
         f"▪️ *Próxima reunião*: {periodo}",
         f"▪️ *Atual*: {_fmt_pct(selic_vigente)}% a.a.",
         f"▪️ *Projeção Focus*: {_fmt_pct(atual.mediana_selic)}% a.a. (mediana)",
