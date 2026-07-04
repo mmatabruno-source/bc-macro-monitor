@@ -84,6 +84,7 @@ def _montar_mensagem(mes_anterior, atual, mes_ano_anterior, grupos):
     variacao_anualizada = calcular_variacao_anualizada(atual.variacao_mensal)
     linhas = [
         f"📈 *IPCA — {atual.mes_referencia}*",
+        "",
         f"*Variação mensal*: {_fmt(atual.variacao_mensal)}%",
         f"*Mês anterior*: {_fmt(mes_anterior.variacao_mensal)}%",
     ]
@@ -96,7 +97,7 @@ def _montar_mensagem(mes_anterior, atual, mes_ano_anterior, grupos):
     ]
     if grupos is not None:
         tabela = _montar_tabela_grupos(grupos)
-        linhas.append(f"\nComposição por grupo:\n```\n{tabela}\n```")
+        linhas.append(f"\nComposição por grupo:\n\n```\n{tabela}\n```")
     return "\n".join(linhas)
 
 
