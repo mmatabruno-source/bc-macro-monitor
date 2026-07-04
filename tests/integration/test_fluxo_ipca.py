@@ -39,7 +39,7 @@ def test_primeiro_mes_notifica(estado_path):
     mock_enviar.assert_called_once()
     texto = mock_enviar.call_args.args[0]
     assert "2026-05" in texto
-    assert "0.58" in texto
+    assert "0,58" in texto
     assert "Composição por grupo" in texto
     assert "Alimentação e bebidas" in texto
     assert "-0,46" in texto
@@ -80,7 +80,7 @@ def test_falha_na_composicao_envia_mensagem_sem_tabela(estado_path):
     assert processado is True
     texto = mock_enviar.call_args.args[0]
     assert "2026-05" in texto
-    assert "0.58" in texto
+    assert "0,58" in texto
     assert "Composição por grupo" not in texto
 
     dados = json.loads(estado_path.read_text())
