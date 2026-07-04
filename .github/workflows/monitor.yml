@@ -25,7 +25,7 @@ jobs:
         env:
           FOCUS_TELEGRAM_BOT_TOKEN: ${{ secrets.FOCUS_TELEGRAM_BOT_TOKEN }}
           FOCUS_TELEGRAM_CHAT_ID: ${{ secrets.FOCUS_TELEGRAM_CHAT_ID }}
-        run: python scripts/enviar_exemplos_telegram.py
+        run: python -m scripts.enviar_exemplos_telegram
 
       - name: Rodar monitor (todos os fluxos, isolados entre si)
         env:
