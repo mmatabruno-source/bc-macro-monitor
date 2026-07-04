@@ -25,11 +25,16 @@ def _fmt(valor):
     return f"{valor:.2f}".replace(".", ",")
 
 
+def _contribuicao(grupo):
+    return grupo.variacao_mensal * grupo.peso_mensal
+
+
 def _montar_tabela_grupos(grupos):
-    linhas = [f"{'Grupo':<{LARGURA_NOME}}{'Var%':>7}{'Peso%':>7}"]
-    for grupo in sorted(grupos, key=lambda g: g.peso_mensal, reverse=True):
+    linhas = [f"{'Grupo':<{LARGURA_NOME}}{'Var%':>7}{'Peso%':>7}{'Contrib':>9}"]
+    for grupo in sorted(grupos, key=_contribuicao, reverse=True):
         linhas.append(
-            f"{grupo.nome:<{LARGURA_NOME}}{_fmt(grupo.variacao_mensal):>7}{_fmt(grupo.peso_mensal):>7}"
+            f"{grupo.nome:<{LARGURA_NOME}}{_fmt(grupo.variacao_mensal):>7}"
+            f"{_fmt(grupo.peso_mensal):>7}{_fmt(_contribuicao(grupo)):>9}"
         )
     return "\n".join(linhas)
 
