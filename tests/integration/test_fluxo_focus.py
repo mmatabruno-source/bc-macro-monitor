@@ -32,7 +32,7 @@ def test_primeira_divulgacao_notifica_com_variacao_vs_selic_vigente(estado_path)
     mock_enviar.assert_called_once()
     texto_enviado = mock_enviar.call_args.args[0]
     assert "*Expectativas Copom - Focus 2026-06-26*" in texto_enviado
-    assert "-0,25p.p." in texto_enviado
+    assert "-0,25 p.p." in texto_enviado
     assert "*Atual*: 14,25% a.a." in texto_enviado
     assert "*Projeção Focus*: 14,00% a.a. (mediana)" in texto_enviado
     assert "4 a 5 de agosto" in texto_enviado
@@ -50,7 +50,7 @@ def test_alta_projetada_usa_emoji_de_alta(estado_path):
         processar()
 
     texto_enviado = mock_enviar.call_args.args[0]
-    assert "+0,25p.p." in texto_enviado
+    assert "+0,25 p.p." in texto_enviado
     assert "📈" in texto_enviado
 
 

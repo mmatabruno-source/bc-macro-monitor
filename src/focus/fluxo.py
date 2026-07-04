@@ -22,7 +22,7 @@ HISTORICO_DIR = Path(__file__).resolve().parent.parent.parent / "historico" / "f
 def _fmt_pp(valor):
     sinal = "+" if valor > 0 else "-" if valor < 0 else ""
     texto = f"{sinal}{abs(valor):.2f}".replace(".", ",")
-    return f"{texto}p.p."
+    return f"{texto} p.p."
 
 
 def _fmt_pct(valor):
