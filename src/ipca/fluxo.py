@@ -117,12 +117,22 @@ def _buscar_mes_ano_anterior(divulgacoes, atual):
     return candidato
 
 
+def _montar_tabela_itens(itens):
+    largura = max(len("Item"), max(len(item.nome) for item in itens)) + 2
+    linhas = [f"{'Item':<{largura}}{'Var%':>7}{'Peso%':>7}"]
+    for item in sorted(itens, key=_contribuicao, reverse=True):
+        linhas.append(f"{item.nome:<{largura}}{_fmt(item.variacao_mensal):>7}{_fmt(item.peso_mensal):>7}")
+    return "\n".join(linhas)
+
+
 def _montar_detalhamento(detalhamento):
     linhas = ["\n*Grupos que mais pressionaram o IPCA para cima:*"]
     for grupo, itens in detalhamento:
-        linhas.append(f"\n*{grupo.nome}*: {_fmt(grupo.variacao_mensal)}% (peso {_fmt(grupo.peso_mensal)}%)")
-        for item in sorted(itens, key=_contribuicao, reverse=True):
-            linhas.append(f"  {item.nome}: {_fmt(item.variacao_mensal)}%")
+        tabela = _montar_tabela_itens(itens)
+        linhas.append(
+            f"\n*{grupo.nome}*: {_fmt(grupo.variacao_mensal)}% (peso {_fmt(grupo.peso_mensal)}%)"
+            f"\n\n```\n{tabela}\n```"
+        )
     return "\n".join(linhas)
 
 
