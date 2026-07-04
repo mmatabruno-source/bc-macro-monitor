@@ -6,11 +6,11 @@ import requests
 BASE = "http://www.ipeadata.gov.br/api/odata4/Metadados"
 
 VARIANTES = [
-    ("sem $format", f"{BASE}?$filter=contains(SERNOME,'IPCA')"),
-    ("$format=json", f"{BASE}?$filter=contains(SERNOME,'IPCA')&$format=json"),
-    ("$format=application/json", f"{BASE}?$filter=contains(SERNOME,'IPCA')&$format=application/json"),
-    ("com $select e $top", f"{BASE}?$filter=contains(SERNOME,'IPCA')&$select=SERCODIGO,SERNOME,PERNOME&$top=50"),
-    ("aspas duplas", f'{BASE}?$filter=contains(SERNOME,"IPCA")'),
+    ("substringof (OData v2/v3)", f"{BASE}?$filter=substringof('IPCA',SERNOME)"),
+    ("sem filtro, só $top", f"{BASE}?$top=3"),
+    ("filtro por igualdade em SERCODIGO conhecido", f"{BASE}?$filter=SERCODIGO eq 'PRECOS12_IPCA12'"),
+    ("startswith", f"{BASE}?$filter=startswith(SERNOME,'IPCA')"),
+    ("aspas simples com espaco codificado", f"{BASE}?%24filter=contains(SERNOME%2C%27IPCA%27)"),
 ]
 
 
@@ -21,7 +21,7 @@ def main():
         try:
             resposta = requests.get(url, timeout=15, headers={"Accept": "application/json"})
             print(f"status_code={resposta.status_code}")
-            print(resposta.text[:1500])
+            print(resposta.text[:2000])
         except Exception as exc:
             print(f"FALHOU: {type(exc).__name__}: {exc}")
 
