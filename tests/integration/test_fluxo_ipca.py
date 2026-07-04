@@ -5,7 +5,7 @@ import pytest
 
 from src.comum.isolamento import _executar_isolado
 from src.ipca.fluxo import processar
-from src.ipca.modelos import DivulgacaoIpca
+from src.ipca.modelos import DivulgacaoIpca, GrupoIpca
 
 
 @pytest.fixture
@@ -20,11 +20,18 @@ def estado_path(tmp_path, monkeypatch):
     return caminho
 
 
+GRUPOS_FAKE = [
+    GrupoIpca(nome="Alimentação e bebidas", variacao_mensal=1.33, peso_mensal=21.5939),
+    GrupoIpca(nome="Transportes", variacao_mensal=-0.46, peso_mensal=20.4854),
+]
+
+
 def test_primeiro_mes_notifica(estado_path):
     anterior = DivulgacaoIpca(mes_referencia="2026-04", variacao_mensal=0.67)
     atual = DivulgacaoIpca(mes_referencia="2026-05", variacao_mensal=0.58)
 
     with patch("src.ipca.fluxo.buscar_ultimas_divulgacoes", return_value=[anterior, atual]), \
+         patch("src.ipca.fluxo.buscar_composicao_ipca", return_value=("2026-05", 0.58, GRUPOS_FAKE)), \
          patch("src.ipca.fluxo.enviar_mensagem") as mock_enviar:
         processado = processar()
 
@@ -33,6 +40,10 @@ def test_primeiro_mes_notifica(estado_path):
     texto = mock_enviar.call_args.args[0]
     assert "2026-05" in texto
     assert "0.58" in texto
+    assert "Composição por grupo" in texto
+    assert "Alimentação e bebidas" in texto
+    assert "-0,46" in texto
+    assert "21,59" in texto
 
     dados = json.loads(estado_path.read_text())
     assert dados["ultimo_ipca"]["mes_referencia"] == "2026-05"
@@ -46,6 +57,7 @@ def test_mesmo_mes_relido_nao_notifica_idempotencia(estado_path):
     atual = DivulgacaoIpca(mes_referencia="2026-05", variacao_mensal=0.58)
 
     with patch("src.ipca.fluxo.buscar_ultimas_divulgacoes", return_value=[anterior, atual]), \
+         patch("src.ipca.fluxo.buscar_composicao_ipca", return_value=("2026-05", 0.58, GRUPOS_FAKE)), \
          patch("src.ipca.fluxo.enviar_mensagem") as mock_enviar:
         processado = processar()
 
