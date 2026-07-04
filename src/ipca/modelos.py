@@ -13,3 +13,10 @@ class DivulgacaoIpca:
 class LeituraImpactoIpca:
     direcao_vs_mes_anterior: str  # "acelerou" | "desacelerou" | "estavel"
     posicao_vs_meta: str  # "acima" | "abaixo" | "em_linha"
+
+
+@dataclass(frozen=True)
+class GrupoIpca:
+    nome: str
+    variacao_mensal: float
+    peso_mensal: float

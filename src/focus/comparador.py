@@ -1,4 +1,5 @@
-"""Lógica de comparação subiu/desceu/manteve/inicial para o fluxo Focus."""
+"""Lógica de comparação para o fluxo Focus: Selic vigente vs. mediana
+projetada pelo Focus para a próxima reunião do Copom."""
 
 from dataclasses import dataclass
 
@@ -10,15 +11,14 @@ class DivulgacaoFocus:
     mediana_selic: float
 
 
-def comparar(anterior, atual):
-    """Retorna 'inicial', 'subiu', 'desceu' ou 'manteve'.
-
-    'inicial': sem baseline anterior, ou troca de reunião monitorada (FR-008).
-    """
-    if anterior is None or anterior.reuniao_id != atual.reuniao_id:
-        return "inicial"
-    if atual.mediana_selic > anterior.mediana_selic:
-        return "subiu"
-    if atual.mediana_selic < anterior.mediana_selic:
-        return "desceu"
-    return "manteve"
+def calcular_variacao(selic_vigente, mediana_projetada):
+    """Retorna (variacao_em_pp, emoji) da mediana projetada em relação à
+    Selic vigente. Negativo = corte projetado, positivo = alta projetada."""
+    variacao = round(mediana_projetada - selic_vigente, 2)
+    if variacao < 0:
+        emoji = "📉"
+    elif variacao > 0:
+        emoji = "📈"
+    else:
+        emoji = "➡️"
+    return variacao, emoji

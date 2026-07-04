@@ -50,8 +50,36 @@
 - **Alternatives considered**: LLM (como Ata/Relatório) — rejeitada por
   decisão do usuário, não há "tom" de texto a interpretar aqui.
 
+## R5 — Composição do IPCA por grupo (variação + peso), fonte de dados
+
+- **Status**: ✅ Resolvido — decisão de arquitetura tomada em 2026-07-04
+  após investigação extensiva com testes reais no GitHub Actions (não
+  hipotéticos). Ver detalhes completos em
+  `specs/003-ipca-mensal/decisoes/composicao-ipca-por-grupo.md`.
+- **Decision**: implementar com `servicodados.ibge.gov.br` (API v3 de
+  Agregados) como fonte, **envolto em fallback obrigatório** — se a
+  chamada falhar, o fluxo envia a mensagem do IPCA sem a tabela de
+  composição (só variação geral + leitura), nunca bloqueando o alerta
+  principal.
+- **Rationale (resumo)**: não existe API do BC com essa abertura, só o
+  IBGE tem. Testado em produção real (GitHub Actions): três fontes
+  candidatas (`apisidra.ibge.gov.br`, `servicodados.ibge.gov.br`,
+  `www.ipeadata.gov.br`) mostraram o mesmo padrão de instabilidade
+  errática (ora respondem em ~1s, ora dão `ConnectTimeout` completo,
+  sem relação com sintaxe de URL, IPv4/IPv6, ou horário) — não é um bug
+  de código, é rede real entre os runners do GitHub Actions e infra
+  `.gov.br`. Self-hosted (runner com IP residencial) resolveria de
+  verdade, mas foi adiado até haver dados de taxa de falha em produção.
+- **Alternatives considered**: `apisidra.ibge.gov.br` (SIDRA antiga,
+  formato "values") — mesma instabilidade, descartada por não ser a
+  API recomendada pela comunidade (wrappers como `sidrapy` já usam a
+  v3). `www.ipeadata.gov.br` (OData4) — não tem confirmação de que
+  possui peso mensal por grupo (só variação), sintaxe de `$filter`
+  nunca validada com sucesso (sempre 400 ou timeout), e mesma
+  instabilidade de rede — descartada por ora.
+
 ## Resumo de bloqueios para a Phase 1
 
 Nenhum bloqueio restante. R1 resolvido com payload real em 2026-07-03;
 `contracts/ipca-sgs.md` está completo e as tarefas de implementação do
-cliente HTTP podem prosseguir.
+cliente HTTP podem prosseguir. R5 documentado em decisão separada.

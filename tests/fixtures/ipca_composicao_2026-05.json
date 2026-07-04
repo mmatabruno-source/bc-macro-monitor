@@ -1,0 +1,56 @@
+[
+  {
+    "id": "63",
+    "variavel": "IPCA - Variação mensal",
+    "unidade": "%",
+    "resultados": [
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7169": "Índice geral"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "0.58"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7170": "1.Alimentação e bebidas"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "1.33"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7445": "2.Habitação"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "1.22"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7486": "3.Artigos de residência"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "0.08"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7558": "4.Vestuário"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "0.62"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7625": "5.Transportes"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "-0.46"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7660": "6.Saúde e cuidados pessoais"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "0.90"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7712": "7.Despesas pessoais"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "0.41"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7766": "8.Educação"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "0.00"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7786": "9.Comunicação"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "0.23"}}]}
+    ]
+  },
+  {
+    "id": "66",
+    "variavel": "IPCA - Peso mensal",
+    "unidade": "%",
+    "resultados": [
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7169": "Índice geral"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "100.0000"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7170": "1.Alimentação e bebidas"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "21.5939"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7445": "2.Habitação"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "15.1949"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7486": "3.Artigos de residência"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "3.4654"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7558": "4.Vestuário"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "4.6271"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7625": "5.Transportes"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "20.4854"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7660": "6.Saúde e cuidados pessoais"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "13.6659"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7712": "7.Despesas pessoais"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "10.2357"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7766": "8.Educação"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "6.2144"}}]},
+      {"classificacoes": [{"id": "315", "nome": "Geral, grupo, subgrupo, item e subitem", "categoria": {"7786": "9.Comunicação"}}],
+       "series": [{"localidade": {"id": "1", "nivel": {"id": "N1", "nome": "Brasil"}, "nome": "Brasil"}, "serie": {"202605": "4.5171"}}]}
+    ]
+  }
+]

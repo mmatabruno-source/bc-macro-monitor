@@ -99,7 +99,7 @@ description: "Task list for feature 004-focus-resumo-semanal"
 ## Phase 6: Polish & Cross-Cutting Concerns
 
 - [x] T012 Rodar os cenários 1–4 de `quickstart.md` via suíte automatizada
-- [ ] T013 Rodar o cenário 5 de `quickstart.md` (chamada real à API) — pendente de ambiente com rede real
+- [x] T013 Rodar o cenário 5 de `quickstart.md` (chamada real à API) — validado via execução manual do workflow `monitor.yml` no GitHub Actions (run #4, id 28707634573, conclusion: success)
 - [x] T014 [P] Revisar logs deste fluxo para confirmar que nenhum token aparece em texto plano (já coberto por `_url_sanitizada`, reaproveitado de `src/comum/http_retry.py`)
 
 ---
