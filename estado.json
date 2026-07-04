@@ -1,4 +1,9 @@
 {
+  "ultima_expectativa_copom": {
+    "data_referencia": "2026-06-26",
+    "mediana_selic": 14.0,
+    "reuniao_id": "R5/2026"
+  },
   "ultimo_ipca": {
     "mes_referencia": "2026-05",
     "variacao_mensal": 0.58
