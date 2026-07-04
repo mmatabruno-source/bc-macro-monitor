@@ -65,6 +65,44 @@ def test_mesmo_mes_relido_nao_notifica_idempotencia(estado_path):
     mock_enviar.assert_not_called()
 
 
+def test_falha_na_composicao_envia_mensagem_sem_tabela(estado_path):
+    """A composição por grupo (IBGE) é instável em produção — ver
+    specs/003-ipca-mensal/decisoes/composicao-ipca-por-grupo.md. Uma falha
+    nela nunca pode bloquear o alerta principal do IPCA (BC/SGS, confiável)."""
+    anterior = DivulgacaoIpca(mes_referencia="2026-04", variacao_mensal=0.67)
+    atual = DivulgacaoIpca(mes_referencia="2026-05", variacao_mensal=0.58)
+
+    with patch("src.ipca.fluxo.buscar_ultimas_divulgacoes", return_value=[anterior, atual]), \
+         patch("src.ipca.fluxo.buscar_composicao_ipca", side_effect=RuntimeError("ConnectTimeout")), \
+         patch("src.ipca.fluxo.enviar_mensagem") as mock_enviar:
+        processado = processar()
+
+    assert processado is True
+    texto = mock_enviar.call_args.args[0]
+    assert "2026-05" in texto
+    assert "0.58" in texto
+    assert "Composição por grupo" not in texto
+
+    dados = json.loads(estado_path.read_text())
+    assert dados["ultimo_ipca"]["mes_referencia"] == "2026-05"
+
+
+def test_mes_da_composicao_divergente_envia_mensagem_sem_tabela(estado_path):
+    """Se o IBGE ainda não publicou a composição do mês mais recente do
+    IPCA geral (BC), não mostra uma tabela de mês errado silenciosamente."""
+    anterior = DivulgacaoIpca(mes_referencia="2026-04", variacao_mensal=0.67)
+    atual = DivulgacaoIpca(mes_referencia="2026-05", variacao_mensal=0.58)
+
+    with patch("src.ipca.fluxo.buscar_ultimas_divulgacoes", return_value=[anterior, atual]), \
+         patch("src.ipca.fluxo.buscar_composicao_ipca", return_value=("2026-04", 0.67, GRUPOS_FAKE)), \
+         patch("src.ipca.fluxo.enviar_mensagem") as mock_enviar:
+        processado = processar()
+
+    assert processado is True
+    texto = mock_enviar.call_args.args[0]
+    assert "Composição por grupo" not in texto
+
+
 def test_falha_na_checagem_e_isolada_e_nao_altera_estado(estado_path):
     estado_path.write_text(json.dumps({
         "ultimo_ipca": {"mes_referencia": "2026-04", "variacao_mensal": 0.67}

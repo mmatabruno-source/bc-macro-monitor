@@ -37,24 +37,48 @@ def _montar_tabela_grupos(grupos):
     return "\n".join(linhas)
 
 
+def _buscar_composicao_com_fallback(mes_referencia_esperado):
+    """Busca a composição por grupo do IPCA. Nunca propaga exceção: a fonte
+    (IBGE) já se mostrou instável em produção (ver
+    specs/003-ipca-mensal/decisoes/composicao-ipca-por-grupo.md) e uma falha
+    aqui não pode bloquear o alerta principal do IPCA, que vem de uma fonte
+    totalmente confiável (BC/SGS)."""
+    try:
+        mes_composicao, _variacao_geral, grupos = buscar_composicao_ipca()
+    except Exception as exc:
+        logger.warning("Composição por grupo do IPCA indisponível — enviando sem a tabela: %s", exc)
+        return None
+
+    if mes_composicao != mes_referencia_esperado:
+        logger.warning(
+            "Composição por grupo (%s) não bate com o mês do IPCA geral (%s) — enviando sem a tabela",
+            mes_composicao, mes_referencia_esperado,
+        )
+        return None
+
+    return grupos
+
+
 def _montar_mensagem(mes_anterior, atual, grupos):
     leitura = gerar_leitura(mes_anterior, atual)
-    tabela = _montar_tabela_grupos(grupos)
-    return (
-        f"📈 IPCA — {atual.mes_referencia}\n"
-        f"Variação mensal: {atual.variacao_mensal}%\n"
+    linhas = [
+        f"📈 IPCA — {atual.mes_referencia}",
+        f"Variação mensal: {atual.variacao_mensal}%",
         f"Leitura: {TEXTO_DIRECAO[leitura.direcao_vs_mes_anterior]} em relação ao mês anterior, "
-        f"{TEXTO_POSICAO[leitura.posicao_vs_meta]}\n\n"
-        f"Composição por grupo:\n"
-        f"```\n{tabela}\n```"
-    )
+        f"{TEXTO_POSICAO[leitura.posicao_vs_meta]}",
+    ]
+    if grupos is not None:
+        tabela = _montar_tabela_grupos(grupos)
+        linhas.append(f"\nComposição por grupo:\n```\n{tabela}\n```")
+    return "\n".join(linhas)
 
 
 def _gravar_historico(divulgacao, grupos):
     HISTORICO_DIR.mkdir(parents=True, exist_ok=True)
     caminho = HISTORICO_DIR / f"{divulgacao.mes_referencia}.json"
     dados = asdict(divulgacao)
-    dados["grupos"] = [asdict(grupo) for grupo in grupos]
+    if grupos is not None:
+        dados["grupos"] = [asdict(grupo) for grupo in grupos]
     caminho.write_text(
         json.dumps(dados, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -75,7 +99,7 @@ def processar():
         logger.info("Mês %s já processado — nada a fazer", atual.mes_referencia)
         return False
 
-    _mes_composicao, _variacao_geral, grupos = buscar_composicao_ipca()
+    grupos = _buscar_composicao_com_fallback(atual.mes_referencia)
     mensagem = _montar_mensagem(mes_anterior_api, atual, grupos)
 
     token = os.environ.get("IPCA_TELEGRAM_BOT_TOKEN")
