@@ -134,6 +134,26 @@ observação empírica própria deste projeto.
    — reavaliar se a taxa de falha em produção real (com o fallback já
    em prática) se mostrar alta demais.
 
+## Extensão: detalhamento por item dos 3 grupos que mais pressionaram para cima
+
+Depois da composição por grupo, o usuário pediu um aprofundamento (nível
+item, ex.: "Cereais, leguminosas e oleaginosas" dentro de "Alimentação e
+bebidas") sem depender de interação com o bot (que exigiria polling ou
+webhook — infraestrutura sempre ligada, fora do modelo de cron do GitHub
+Actions). Solução adotada: a própria mensagem automática já traz o
+detalhamento dos 3 grupos com maior `variação × peso` entre os de
+variação positiva, com todos os itens de cada um.
+
+Isso usa a mesma tabela 7060, mesmo domínio (`servicodados.ibge.gov.br`),
+mas uma **segunda chamada HTTP independente** (`buscar_itens_por_grupo`
+em `src/ipca/cliente_composicao.py`, com `classificacao=315[all]` em vez
+da lista fixa de 9 grupos) — logo sujeita exatamente à mesma
+instabilidade de rede documentada acima. Por isso tem seu próprio
+fallback (`_buscar_detalhamento_com_fallback` em `src/ipca/fluxo.py`),
+seguindo o mesmo padrão: qualquer falha (exceção ou mês divergente do
+IPCA geral) omite só essa seção, sem bloquear a mensagem principal nem a
+tabela de composição por grupo.
+
 ## Runs de teste reais referenciados (para auditoria futura)
 
 Todos no repositório `mmatabruno-source/bc-macro-monitor`, branch
