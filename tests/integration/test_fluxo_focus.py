@@ -33,8 +33,8 @@ def test_primeira_divulgacao_notifica_com_variacao_vs_selic_vigente(estado_path)
     texto_enviado = mock_enviar.call_args.args[0]
     assert "Boletim Focus (2026-06-26)" in texto_enviado
     assert "-0,25p.p." in texto_enviado
-    assert "Antes: 14,25% a.a." in texto_enviado
-    assert "Depois: 14,00% a.a. (mediana)" in texto_enviado
+    assert "*Atual*: 14,25% a.a." in texto_enviado
+    assert "*Projeção Focus*: 14,00% a.a. (mediana)" in texto_enviado
     assert "4 a 5 de agosto" in texto_enviado
 
     dados = json.loads(estado_path.read_text())

@@ -20,7 +20,8 @@ HISTORICO_DIR = Path(__file__).resolve().parent.parent.parent / "historico" / "f
 
 
 def _fmt_pp(valor):
-    texto = f"{valor:+.2f}".replace(".", ",")
+    sinal = "+" if valor > 0 else "-" if valor < 0 else ""
+    texto = f"{sinal}{abs(valor):.2f}".replace(".", ",")
     return f"{texto}p.p."
 
 
@@ -34,10 +35,10 @@ def _montar_mensagem(atual, selic_vigente):
     return "\n".join([
         f"📢 Boletim Focus ({atual.data_referencia})",
         "",
-        f"{emoji} O Focus projeta uma variação de {_fmt_pp(variacao)} na Selic",
-        f"▪️ Antes: {_fmt_pct(selic_vigente)}% a.a.",
-        f"▪️ Depois: {_fmt_pct(atual.mediana_selic)}% a.a. (mediana)",
-        f"▪️ Próxima reunião: {periodo}",
+        f"{emoji} O Mercado Financeiro projeta uma *variação de {_fmt_pp(variacao)}* na Selic",
+        f"▪️ *Próxima reunião*: {periodo}",
+        f"▪️ *Atual*: {_fmt_pct(selic_vigente)}% a.a.",
+        f"▪️ *Projeção Focus*: {_fmt_pct(atual.mediana_selic)}% a.a. (mediana)",
     ])
 
 
