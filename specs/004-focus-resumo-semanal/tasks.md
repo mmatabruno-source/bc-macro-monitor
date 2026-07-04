@@ -24,7 +24,7 @@ description: "Task list for feature 004-focus-resumo-semanal"
 
 ## Phase 1: Setup
 
-- [ ] T001 Criar diretório `historico/focus_resumo/` (com `.gitkeep`)
+- [x] T001 Criar diretório `historico/focus_resumo/` (com `.gitkeep`)
 
 **Checkpoint**: `src/comum/` já existe — nenhuma infraestrutura nova bloqueante.
 
@@ -46,14 +46,14 @@ description: "Task list for feature 004-focus-resumo-semanal"
 
 ### Tests for User Story 1
 
-- [ ] T002 [P] [US1] Contract test do parser em `tests/contract/test_contrato_focus_resumo.py`, usando `tests/fixtures/expectativas_anuais_2026-06-26.json` e as regras de `contracts/expectativas-anuais.md`
-- [ ] T003 [P] [US1] Teste de integração do fluxo completo (checar → montar mensagem → notificar → gravar estado) em `tests/integration/test_fluxo_focus_resumo.py`, com API mockada a partir da fixture
+- [x] T002 [P] [US1] Contract test do parser em `tests/contract/test_contrato_focus_resumo.py`, usando `tests/fixtures/expectativas_anuais_2026-06-26.json` e as regras de `contracts/expectativas-anuais.md`
+- [x] T003 [P] [US1] Teste de integração do fluxo completo (checar → montar mensagem → notificar → gravar estado) em `tests/integration/test_fluxo_focus_resumo.py`, com API mockada a partir da fixture
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] Implementar `src/focus_resumo/cliente_expectativas_anuais.py`: descobre a `Data` mais recente (Regra 3 do contrato), filtra pelos 4 indicadores com `baseCalculo=0`, retorna lista de `ValorIndicadorAno` para o ano corrente + 4 seguintes (calculados dinamicamente, nunca hardcoded)
-- [ ] T005 [US1] Implementar `src/focus_resumo/fluxo.py` (esqueleto): checagem (T004) → verificação de idempotência por `data_referencia` → montagem da mensagem (sem direção ainda) → envio → gravação de estado (chave `ultimo_resumo_focus`) SOMENTE após confirmação de envio
-- [ ] T006 [US1] Implementar gravação de histórico em `historico/focus_resumo/<data_referencia>.json`
+- [x] T004 [US1] Implementar `src/focus_resumo/cliente_expectativas_anuais.py`: descobre a `Data` mais recente (Regra 3 do contrato), filtra pelos 4 indicadores com `baseCalculo=0`, retorna lista de `ValorIndicadorAno` para o ano corrente + 4 seguintes (calculados dinamicamente, nunca hardcoded)
+- [x] T005 [US1] Implementar `src/focus_resumo/fluxo.py` (esqueleto): checagem (T004) → verificação de idempotência por `data_referencia` → montagem da mensagem (sem direção ainda) → envio → gravação de estado (chave `ultimo_resumo_focus`) SOMENTE após confirmação de envio
+- [x] T006 [US1] Implementar gravação de histórico em `historico/focus_resumo/<data_referencia>.json`
 
 **Checkpoint**: User Story 1 completa — MVP (resumo sem direção ainda).
 
@@ -67,12 +67,12 @@ description: "Task list for feature 004-focus-resumo-semanal"
 
 ### Tests for User Story 2
 
-- [ ] T007 [P] [US2] Testes unitários da lógica de comparação em `tests/unit/test_comparador_resumo.py`: subiu/desceu/manteve/sem-histórico, por (indicador, ano) independente dos demais
+- [x] T007 [P] [US2] Testes unitários da lógica de comparação em `tests/unit/test_comparador_resumo.py`: subiu/desceu/manteve/sem-histórico, por (indicador, ano) independente dos demais
 
 ### Implementation for User Story 2
 
-- [ ] T008 [US2] Implementar `src/focus_resumo/comparador.py`: dado o registro anterior (dict `"{indicador}:{ano}" -> valor`, ou ausência) e os novos `ValorIndicadorAno`, retorna a direção por item (sem contador)
-- [ ] T009 [US2] Integrar `comparador.py` (T008) à montagem da mensagem em `fluxo.py` (T005)
+- [x] T008 [US2] Implementar `src/focus_resumo/comparador.py`: dado o registro anterior (dict `"{indicador}:{ano}" -> valor`, ou ausência) e os novos `ValorIndicadorAno`, retorna a direção por item (sem contador)
+- [x] T009 [US2] Integrar `comparador.py` (T008) à montagem da mensagem em `fluxo.py` (T005)
 
 **Checkpoint**: Mensagem completa com direção por item quando há histórico.
 
@@ -86,11 +86,11 @@ description: "Task list for feature 004-focus-resumo-semanal"
 
 ### Tests for User Story 3
 
-- [ ] T010 [P] [US3] Teste de integração de falha isolada em `tests/integration/test_fluxo_focus_resumo.py` (mesma suíte de T003)
+- [x] T010 [P] [US3] Teste de integração de falha isolada em `tests/integration/test_fluxo_focus_resumo.py` (mesma suíte de T003)
 
 ### Implementation for User Story 3
 
-- [ ] T011 [US3] Envolver a chamada ao fluxo em `src/main.py` com `_executar_isolado`, passando `FOCUS_TELEGRAM_BOT_TOKEN`/`FOCUS_TELEGRAM_CHAT_ID` para `notificar_falha`
+- [x] T011 [US3] Envolver a chamada ao fluxo em `src/main.py` com `_executar_isolado`, passando `FOCUS_TELEGRAM_BOT_TOKEN`/`FOCUS_TELEGRAM_CHAT_ID` para `notificar_falha`
 
 **Checkpoint**: Todas as três user stories funcionam de forma independente e isolada.
 
@@ -98,9 +98,9 @@ description: "Task list for feature 004-focus-resumo-semanal"
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T012 Rodar os cenários 1–4 de `quickstart.md` via suíte automatizada
+- [x] T012 Rodar os cenários 1–4 de `quickstart.md` via suíte automatizada
 - [ ] T013 Rodar o cenário 5 de `quickstart.md` (chamada real à API) — pendente de ambiente com rede real
-- [ ] T014 [P] Revisar logs deste fluxo para confirmar que nenhum token aparece em texto plano (já coberto por `_url_sanitizada`, reaproveitado de `src/comum/http_retry.py`)
+- [x] T014 [P] Revisar logs deste fluxo para confirmar que nenhum token aparece em texto plano (já coberto por `_url_sanitizada`, reaproveitado de `src/comum/http_retry.py`)
 
 ---
 
