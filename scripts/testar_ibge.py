@@ -1,44 +1,35 @@
-"""Script manual único para testar a sintaxe do IPEADATA usando o dicionário
-`params=` do requests (deixando a lib codificar a URL corretamente), igual
-aos projetos reais (brazilvisible, OpenFinData) que usam essa API com
-sucesso. Remover após o teste."""
+"""Última tentativa: buscar o $metadata do serviço para confirmar nomes reais
+de entidades/campos, e testar sem $filter algum (só listar). Remover após o
+teste."""
 
 import requests
 
-BASE = "http://www.ipeadata.gov.br/api/odata4/Metadados"
+BASE = "http://www.ipeadata.gov.br/api/odata4"
 
 
 def main():
-    print("=== via params= (requests codifica) ===")
+    print("=== $metadata (schema real) ===")
     try:
-        resposta = requests.get(
-            BASE,
-            params={
-                "$top": 20,
-                "$filter": "contains(SERNOME,'IPCA')",
-                "$select": "SERCODIGO,SERNOME,PERNOME,UNINOME",
-            },
-            timeout=15,
-        )
-        print(f"url final: {resposta.url}")
+        resposta = requests.get(f"{BASE}/$metadata", timeout=15)
         print(f"status_code={resposta.status_code}")
         print(resposta.text[:3000])
     except Exception as exc:
         print(f"FALHOU: {type(exc).__name__}: {exc}")
 
-    print("\n=== com espaço depois da vírgula no contains ===")
+    print("\n=== Metadados sem nenhum parametro ===")
     try:
-        resposta = requests.get(
-            BASE,
-            params={
-                "$top": 20,
-                "$filter": "contains(SERNOME, 'IPCA')",
-            },
-            timeout=15,
-        )
+        resposta = requests.get(f"{BASE}/Metadados", timeout=15)
+        print(f"status_code={resposta.status_code}")
+        print(resposta.text[:1500])
+    except Exception as exc:
+        print(f"FALHOU: {type(exc).__name__}: {exc}")
+
+    print("\n=== Metadados com $top apenas ===")
+    try:
+        resposta = requests.get(f"{BASE}/Metadados", params={"$top": 3}, timeout=15)
         print(f"url final: {resposta.url}")
         print(f"status_code={resposta.status_code}")
-        print(resposta.text[:3000])
+        print(resposta.text[:1500])
     except Exception as exc:
         print(f"FALHOU: {type(exc).__name__}: {exc}")
 
