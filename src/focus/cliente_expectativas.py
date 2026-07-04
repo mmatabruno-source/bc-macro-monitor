@@ -1,6 +1,8 @@
 """Cliente HTTP do endpoint ExpectativasMercadoSelic (Focus), conforme
 specs/001-focus-copom-alert/contracts/focus-api.md (verificado com payload real)."""
 
+from urllib.parse import quote, urlencode
+
 from src.comum.http_retry import requisitar_com_retry
 from src.focus.comparador import DivulgacaoFocus
 
@@ -8,6 +10,15 @@ BASE_URL = (
     "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/"
     "ExpectativasMercadoSelic"
 )
+
+
+def _montar_url(params):
+    # requests.params codifica espaço como '+' (urlencode padrão), mas a API
+    # OData do BCB retorna 400 Bad Request para '+' — exige '%20' literal,
+    # confirmado em produção (T030). Por isso montamos a URL manualmente
+    # com quote_via=quote em vez de passar params= para requests.
+    query = urlencode(params, quote_via=quote)
+    return f"{BASE_URL}?{query}"
 
 
 def _parse_reuniao(reuniao_id):
@@ -29,16 +40,13 @@ def _escolher_proxima_reuniao(linhas):
 
 
 def _data_mais_recente():
-    resposta = requisitar_com_retry(
-        "GET",
-        BASE_URL,
-        params={
-            "$filter": "Indicador eq 'Selic'",
-            "$orderby": "Data desc",
-            "$top": "1",
-            "$format": "json",
-        },
-    )
+    url = _montar_url({
+        "$filter": "Indicador eq 'Selic'",
+        "$orderby": "Data desc",
+        "$top": "1",
+        "$format": "json",
+    })
+    resposta = requisitar_com_retry("GET", url)
     resposta.raise_for_status()
     linhas = resposta.json()["value"]
     return linhas[0]["Data"]
@@ -49,14 +57,11 @@ def buscar_proxima_reuniao():
     do Copom, com base na divulgação mais recente disponível."""
     data_referencia = _data_mais_recente()
 
-    resposta = requisitar_com_retry(
-        "GET",
-        BASE_URL,
-        params={
-            "$filter": f"Data eq '{data_referencia}' and Indicador eq 'Selic'",
-            "$format": "json",
-        },
-    )
+    url = _montar_url({
+        "$filter": f"Data eq '{data_referencia}' and Indicador eq 'Selic'",
+        "$format": "json",
+    })
+    resposta = requisitar_com_retry("GET", url)
     resposta.raise_for_status()
     linhas = resposta.json()["value"]
 
