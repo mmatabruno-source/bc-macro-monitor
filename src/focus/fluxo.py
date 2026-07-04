@@ -33,7 +33,7 @@ def _montar_mensagem(atual, selic_vigente):
     variacao, emoji = calcular_variacao(selic_vigente, atual.mediana_selic)
     periodo = formatar_periodo_reuniao(atual.reuniao_id)
     return "\n".join([
-        f"📢 Boletim Focus ({atual.data_referencia})",
+        f"📢 *Expectativas Copom - Focus {atual.data_referencia}*",
         "",
         f"{emoji} Projeta-se uma *variação de {_fmt_pp(variacao)}* na Selic",
         f"▪️ *Próxima reunião*: {periodo}",
