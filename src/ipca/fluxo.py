@@ -8,7 +8,7 @@ from pathlib import Path
 
 from src.comum.estado import ESTADO_PATH, gravar_estado, ler_estado
 from src.comum.telegram import _sanitizar, enviar_mensagem
-from src.ipca.cliente_composicao import buscar_composicao_ipca
+from src.ipca.cliente_composicao import NUMERO_GRUPO, buscar_composicao_ipca, buscar_itens_por_grupo
 from src.ipca.cliente_sgs import buscar_ultimas_divulgacoes
 from src.ipca.leitura_impacto import META_INFLACAO_CENTRO, calcular_variacao_anualizada
 from src.ipca.modelos import DivulgacaoIpca
@@ -61,6 +61,38 @@ def _buscar_composicao_com_fallback(mes_referencia_esperado):
     return grupos
 
 
+def _top3_grupos_que_mais_subiram(grupos):
+    candidatos = [g for g in grupos if g.variacao_mensal > 0]
+    candidatos.sort(key=_contribuicao, reverse=True)
+    return candidatos[:3]
+
+
+def _buscar_detalhamento_com_fallback(mes_referencia_esperado, grupos):
+    """Detalha por item os 3 grupos que mais pressionaram o IPCA para cima
+    (maior variação × peso, só grupos com variação positiva). Chamada HTTP
+    independente da composição por grupo — nunca propaga exceção nem
+    bloqueia a mensagem principal (mesmo padrão de
+    _buscar_composicao_com_fallback)."""
+    top3 = _top3_grupos_que_mais_subiram(grupos)
+    if not top3:
+        return None
+
+    try:
+        mes_itens, itens_por_grupo = buscar_itens_por_grupo()
+    except Exception as exc:
+        logger.warning("Detalhamento por item indisponível — omitindo da mensagem: %s", exc)
+        return None
+
+    if mes_itens != mes_referencia_esperado:
+        logger.warning(
+            "Detalhamento por item (%s) não bate com o mês do IPCA geral (%s) — omitindo",
+            mes_itens, mes_referencia_esperado,
+        )
+        return None
+
+    return [(grupo, itens_por_grupo.get(NUMERO_GRUPO[grupo.nome], [])) for grupo in top3]
+
+
 def _mes_ano_anterior_esperado(mes_referencia):
     ano, mes = mes_referencia.split("-")
     return f"{int(ano) - 1}-{mes}"
@@ -85,7 +117,16 @@ def _buscar_mes_ano_anterior(divulgacoes, atual):
     return candidato
 
 
-def _montar_mensagem(mes_anterior, atual, mes_ano_anterior, grupos):
+def _montar_detalhamento(detalhamento):
+    linhas = ["\n*Grupos que mais pressionaram o IPCA para cima:*"]
+    for grupo, itens in detalhamento:
+        linhas.append(f"\n*{grupo.nome}*: {_fmt(grupo.variacao_mensal)}% (peso {_fmt(grupo.peso_mensal)}%)")
+        for item in sorted(itens, key=_contribuicao, reverse=True):
+            linhas.append(f"  {item.nome}: {_fmt(item.variacao_mensal)}%")
+    return "\n".join(linhas)
+
+
+def _montar_mensagem(mes_anterior, atual, mes_ano_anterior, grupos, detalhamento):
     variacao_anualizada = calcular_variacao_anualizada(atual.variacao_mensal)
     linhas = [
         f"📈 *IPCA — {atual.mes_referencia}*",
@@ -103,6 +144,8 @@ def _montar_mensagem(mes_anterior, atual, mes_ano_anterior, grupos):
     if grupos is not None:
         tabela = _montar_tabela_grupos(grupos)
         linhas.append(f"\nComposição por grupo:\n\n```\n{tabela}\n```")
+    if detalhamento is not None:
+        linhas.append(_montar_detalhamento(detalhamento))
     return "\n".join(linhas)
 
 
@@ -134,7 +177,8 @@ def processar():
         return False
 
     grupos = _buscar_composicao_com_fallback(atual.mes_referencia)
-    mensagem = _montar_mensagem(mes_anterior_api, atual, mes_ano_anterior, grupos)
+    detalhamento = _buscar_detalhamento_com_fallback(atual.mes_referencia, grupos) if grupos is not None else None
+    mensagem = _montar_mensagem(mes_anterior_api, atual, mes_ano_anterior, grupos, detalhamento)
 
     token = os.environ.get("IPCA_TELEGRAM_BOT_TOKEN")
     chat_id = os.environ.get("IPCA_TELEGRAM_CHAT_ID")

@@ -33,6 +33,20 @@ BASE_URL = (
     "variaveis/63|66?localidades=N1[all]&classificacao=315[{codigos}]"
 )
 
+# Número oficial (1-9) de cada grupo, usado para ligar item -> grupo pai
+# (o primeiro dígito do código de 4 dígitos do item é esse número).
+NUMERO_GRUPO = {
+    "Alimentação e bebidas": 1,
+    "Habitação": 2,
+    "Artigos de residência": 3,
+    "Vestuário": 4,
+    "Transportes": 5,
+    "Saúde e cuidados pessoais": 6,
+    "Despesas pessoais": 7,
+    "Educação": 8,
+    "Comunicação": 9,
+}
+
 
 def _parse_mes_referencia(codigo_periodo):
     # "202605" -> "2026-05"
@@ -77,3 +91,55 @@ def buscar_composicao_ipca():
     resposta = requisitar_com_retry("GET", url, timeout=20)
     resposta.raise_for_status()
     return _parse_payload(resposta.json())
+
+
+def _nivel_e_nome(d4n_completo):
+    """'1101.Cereais, leguminosas e oleaginosas' -> (4, 'Cereais, leguminosas e oleaginosas').
+    Retorna (None, texto) para linhas sem prefixo numérico (ex.: 'Índice geral')."""
+    prefixo, ponto, nome = d4n_completo.partition(".")
+    if ponto and prefixo.isdigit():
+        return len(prefixo), nome
+    return None, d4n_completo
+
+
+def _parse_payload_itens(payload):
+    """Recebe o payload bruto da API v3 com TODOS os níveis (classificacao
+    315/all) e retorna (mes_referencia, {numero_grupo: [GrupoIpca, ...]}) só
+    com as linhas de nível 'item' (4 dígitos no D4N)."""
+    valores = {}   # codigo -> {var_id: valor}
+    nomes = {}     # codigo -> "d4n completo com prefixo"
+    mes_referencia = None
+
+    for variavel in payload:
+        var_id = variavel["id"]
+        for resultado in variavel["resultados"]:
+            codigo, nome_completo = next(iter(resultado["classificacoes"][0]["categoria"].items()))
+            serie = resultado["series"][0]["serie"]
+            codigo_periodo, valor = next(iter(serie.items()))
+            mes_referencia = _parse_mes_referencia(codigo_periodo)
+            valores.setdefault(codigo, {})[var_id] = float(valor)
+            nomes[codigo] = nome_completo
+
+    itens_por_grupo = {n: [] for n in NUMERO_GRUPO.values()}
+    for codigo, nome_completo in nomes.items():
+        nivel, nome = _nivel_e_nome(nome_completo)
+        if nivel != 4:
+            continue
+        if "63" not in valores.get(codigo, {}) or "66" not in valores.get(codigo, {}):
+            continue
+        numero_grupo = int(nome_completo[0])
+        itens_por_grupo.setdefault(numero_grupo, []).append(
+            GrupoIpca(nome=nome, variacao_mensal=valores[codigo]["63"], peso_mensal=valores[codigo]["66"])
+        )
+
+    return mes_referencia, itens_por_grupo
+
+
+def buscar_itens_por_grupo():
+    """Retorna (mes_referencia, {numero_grupo: [GrupoIpca, ...]}) com os itens
+    (nível 4 dígitos) de todos os grupos, numa chamada separada da
+    composição por grupo (ver buscar_composicao_ipca)."""
+    url = BASE_URL.format(codigos="all")
+    resposta = requisitar_com_retry("GET", url, timeout=20)
+    resposta.raise_for_status()
+    return _parse_payload_itens(resposta.json())

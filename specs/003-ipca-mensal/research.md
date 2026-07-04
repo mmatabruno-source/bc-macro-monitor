@@ -78,6 +78,26 @@
   nunca validada com sucesso (sempre 400 ou timeout), e mesma
   instabilidade de rede — descartada por ora.
 
+## R6 — Detalhamento por item dos 3 grupos que mais pressionaram o IPCA para cima
+
+- **Status**: ✅ Resolvido — implementado como extensão do R5, sem
+  interação com o bot (sem polling/webhook, que exigiriam infra sempre
+  ligada fora do modelo de cron). Ver detalhes em
+  `specs/003-ipca-mensal/decisoes/composicao-ipca-por-grupo.md`.
+- **Decision**: usar `classificacao=315[all]` na mesma tabela 7060 do
+  IBGE (segunda chamada HTTP independente, `buscar_itens_por_grupo`),
+  filtrando pelo prefixo numérico do `D4N` (4 dígitos = nível item);
+  selecionar os 3 grupos com maior `variação_mensal × peso_mensal` entre
+  os de variação positiva, e mostrar todos os itens de cada um. Mesmo
+  fallback obrigatório de R5 (falha ou mês divergente omite só essa
+  seção da mensagem).
+- **Rationale**: decisão do usuário — evita construir infraestrutura de
+  interação (bot respondendo a comandos) mantendo o modelo de push
+  periódico já existente.
+- **Alternatives considered**: interação via bot (comandos, ex.
+  `/detalhe Alimentação`) — rejeitada por exigir self-hosted/polling
+  contínuo, fora do escopo do cron atual.
+
 ## Resumo de bloqueios para a Phase 1
 
 Nenhum bloqueio restante. R1 resolvido com payload real em 2026-07-03;
