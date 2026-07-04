@@ -56,12 +56,40 @@ def _buscar_composicao_com_fallback(mes_referencia_esperado):
     return grupos
 
 
-def _montar_mensagem(mes_anterior, atual, grupos):
+def _mes_ano_anterior_esperado(mes_referencia):
+    ano, mes = mes_referencia.split("-")
+    return f"{int(ano) - 1}-{mes}"
+
+
+def _buscar_mes_ano_anterior(divulgacoes, atual):
+    """Retorna a divulgação de 12 meses atrás (mesmo mês do ano anterior),
+    ou None se a API não tiver retornado dados suficientes ou o mês não
+    bater com o esperado (nunca bloqueia a mensagem principal por causa
+    disso)."""
+    if len(divulgacoes) < 13:
+        return None
+
+    candidato = divulgacoes[-13]
+    if candidato.mes_referencia != _mes_ano_anterior_esperado(atual.mes_referencia):
+        logger.warning(
+            "Mês do ano anterior (%s) não bate com o esperado para %s — omitindo da mensagem",
+            candidato.mes_referencia, atual.mes_referencia,
+        )
+        return None
+
+    return candidato
+
+
+def _montar_mensagem(mes_anterior, atual, mes_ano_anterior, grupos):
     variacao_anualizada = calcular_variacao_anualizada(atual.variacao_mensal)
     linhas = [
         f"📈 *IPCA — {atual.mes_referencia}*",
         f"*Variação mensal*: {_fmt(atual.variacao_mensal)}%",
         f"*Mês anterior*: {_fmt(mes_anterior.variacao_mensal)}%",
+    ]
+    if mes_ano_anterior is not None:
+        linhas.append(f"*Mês do ano anterior*: {_fmt(mes_ano_anterior.variacao_mensal)}%")
+    linhas += [
         "",
         f"*Variação anualizada*: {_fmt(variacao_anualizada)}% a.a.",
         f"*Meta de inflação*: {_fmt(META_INFLACAO_CENTRO)}% a.a.",
@@ -87,9 +115,10 @@ def _gravar_historico(divulgacao, grupos):
 def processar():
     """Executa uma checagem do fluxo IPCA. Retorna True se um novo mês foi
     processado e notificado, False caso contrário."""
-    divulgacoes = buscar_ultimas_divulgacoes()
+    divulgacoes = buscar_ultimas_divulgacoes(quantidade=13)
     atual = divulgacoes[-1]
     mes_anterior_api = divulgacoes[-2]
+    mes_ano_anterior = _buscar_mes_ano_anterior(divulgacoes, atual)
 
     estado_anterior = ler_estado(CHAVE_ESTADO, caminho=ESTADO_PATH)
     anterior_registrado = DivulgacaoIpca(**estado_anterior) if estado_anterior else None
@@ -99,7 +128,7 @@ def processar():
         return False
 
     grupos = _buscar_composicao_com_fallback(atual.mes_referencia)
-    mensagem = _montar_mensagem(mes_anterior_api, atual, grupos)
+    mensagem = _montar_mensagem(mes_anterior_api, atual, mes_ano_anterior, grupos)
 
     token = os.environ.get("IPCA_TELEGRAM_BOT_TOKEN")
     chat_id = os.environ.get("IPCA_TELEGRAM_CHAT_ID")
