@@ -60,6 +60,6 @@ def buscar_composicao_ipca():
     codigos = ",".join([CODIGO_INDICE_GERAL] + list(CODIGOS_GRUPOS))
     url = BASE_URL.format(codigos=codigos)
 
-    resposta = requisitar_com_retry("GET", url, params={"formato": "json"})
+    resposta = requisitar_com_retry("GET", url, params={"formato": "json"}, timeout=20)
     resposta.raise_for_status()
     return _parse_payload(resposta.json())
