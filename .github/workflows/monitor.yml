@@ -2,7 +2,11 @@ name: Monitor Macro do BC
 
 on:
   schedule:
-    - cron: "0 12 * * 1-5"
+    # 12:20 UTC = 09:20 horário de Brasília. Margem de 20min após a
+    # divulgação do IPCA pelo IBGE (09:00 BRT, Portaria IBGE 355/2007) —
+    # a fonte mais apertada; Boletim Focus (~08:30 BRT) e RPM (08:00 BRT)
+    # já saem bem antes.
+    - cron: "20 12 * * 1-5"
   workflow_dispatch: {}
 
 permissions:
