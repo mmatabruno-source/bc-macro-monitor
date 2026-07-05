@@ -11,7 +11,7 @@ from src.comum.http_retry import requisitar_com_retry
 from src.relatorio.modelos import AnaliseCritica
 
 MODELO = "claude-sonnet-5"
-MAX_TOKENS = 2048
+MAX_TOKENS = 8192
 
 MARCADOR_CIDADAO = "### VISAO_CIDADAO"
 MARCADOR_INVESTIDOR = "### VISAO_INVESTIDOR"
