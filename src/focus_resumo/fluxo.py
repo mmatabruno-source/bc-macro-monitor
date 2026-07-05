@@ -15,8 +15,6 @@ logger = logging.getLogger(__name__)
 CHAVE_ESTADO = "ultimo_resumo_focus"
 HISTORICO_DIR = Path(__file__).resolve().parent.parent.parent / "historico" / "focus_resumo"
 
-TEXTO_DIRECAO = {"subiu": " (subiu)", "desceu": " (desceu)", "manteve": "", None: ""}
-
 ORDEM_INDICADORES = ["IPCA", "Selic", "Câmbio", "PIB Total"]
 
 CONFIG_INDICADOR = {
@@ -31,7 +29,17 @@ def _fmt(valor, casas):
     return f"{valor:.{casas}f}".replace(".", ",")
 
 
-def _montar_mensagem(divulgacao, direcoes):
+def _texto_direcao(direcao, delta, casas):
+    if direcao is None:
+        return ""
+    if direcao == "subiu":
+        return f" ▲ {_fmt(delta, casas)} p.p."
+    if direcao == "desceu":
+        return f" ▼ {_fmt(abs(delta), casas)} p.p."
+    return " = 0 p.p."
+
+
+def _montar_mensagem(divulgacao, direcoes, valores_anteriores):
     linhas = [f"📋 *Resumo Focus — {divulgacao.data_referencia}*"]
 
     por_indicador = {}
@@ -47,8 +55,13 @@ def _montar_mensagem(divulgacao, direcoes):
         for item in sorted(itens, key=lambda i: i.ano):
             chave = f"{item.indicador}:{item.ano}"
             direcao = direcoes.get(chave)
+            anterior = valores_anteriores.get(chave)
+            delta = item.valor - anterior if anterior is not None else None
             valor_fmt = _fmt(item.valor, config["casas"])
-            linhas.append(f"▪️ *{item.ano}*: {valor_fmt}{config['sufixo']}{TEXTO_DIRECAO[direcao]}")
+            linhas.append(
+                f"▪️ *{item.ano}*: {valor_fmt}{config['sufixo']}"
+                f"{_texto_direcao(direcao, delta, config['casas'])}"
+            )
 
     return "\n".join(linhas)
 
@@ -80,7 +93,7 @@ def processar():
 
     valores_anteriores = estado_anterior.get("valores", {}) if estado_anterior else {}
     direcoes = comparar_valores(valores_anteriores, divulgacao.valores)
-    mensagem = _montar_mensagem(divulgacao, direcoes)
+    mensagem = _montar_mensagem(divulgacao, direcoes, valores_anteriores)
 
     token = os.environ.get("FOCUS_TELEGRAM_BOT_TOKEN")
     chat_id = os.environ.get("FOCUS_TELEGRAM_CHAT_ID")
