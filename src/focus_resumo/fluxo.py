@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 CHAVE_ESTADO = "ultimo_resumo_focus"
 HISTORICO_DIR = Path(__file__).resolve().parent.parent.parent / "historico" / "focus_resumo"
 
-TEXTO_DIRECAO = {"subiu": " (subiu)", "desceu": " (desceu)", "manteve": " (manteve)", None: ""}
+TEXTO_DIRECAO = {"subiu": " (subiu)", "desceu": " (desceu)", "manteve": "", None: ""}
 
 ORDEM_INDICADORES = ["IPCA", "Selic", "Câmbio", "PIB Total"]
 
