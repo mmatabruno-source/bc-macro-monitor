@@ -27,8 +27,8 @@
 
 | Campo | Tipo | Descrição |
 |---|---|---|
-| `data_referencia` | string | Última divulgação processada com sucesso |
-| `valores` | dict | Mapa `"{indicador}:{ano}"` → `valor`, usado para calcular direção na próxima checagem (FR-004) |
+| `data_referencia` | string | Última divulgação processada com sucesso — chave de idempotência |
+| `valores` | dict | Mapa `"{indicador}:{ano}"` → `valor` — gravado para auditoria/histórico; desde 2026-07-05 (trilha leve) NÃO é mais usado para calcular direção, que sempre busca a penúltima divulgação diretamente da API (ver research.md R4) |
 
 **Transições de estado**:
 1. **Vazio → Primeira divulgação registrada**: todos os valores aparecem

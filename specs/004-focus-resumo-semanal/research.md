@@ -20,11 +20,25 @@
 
 ## R4 — Comparação semanal
 
-- **Status**: ✅ Resolvido, decisão direta do usuário: comparar contra o
-  último valor registrado no histórico próprio deste fluxo (por
-  indicador/ano), não contra o "há 1 semana" que o boletim oficial expõe
-  (que não está disponível via API de qualquer forma). Sem contador de
-  quantas semanas o comportamento se repete.
+- **Status**: ✅ Resolvido, decisão direta do usuário: comparar contra a
+  divulgação anterior (por indicador/ano), não contra o "há 1 semana" que
+  o boletim oficial expõe (que não está disponível via API de qualquer
+  forma). Sem contador de quantas semanas o comportamento se repete.
+- **Atualização (2026-07-05, trilha leve)**: a implementação original
+  comparava contra o valor persistido em `estado.json` da execução
+  anterior deste próprio fluxo. O usuário pediu explicitamente que a
+  comparação **sempre** busque a divulgação mais recente E a penúltima
+  diretamente da API (2 chamadas), nunca dependendo de estado local —
+  motivado por um teste manual em que o estado local tinha sido
+  sobrescrito com valores idênticos aos atuais (artefato do próprio
+  teste), mascarando se a comparação de verdade funcionava. Agora
+  `buscar_datas_recentes()` busca as 2 datas mais recentes distintas
+  (`$top=100` — cada data tem várias linhas, uma por indicador/ano) e
+  `buscar_divulgacao(data)` busca os valores de uma data específica;
+  `estado.json` continua guardando `data_referencia` (idempotência) e
+  `valores` (auditoria), mas não é mais usado para calcular a direção.
+  Falha ao buscar a penúltima é tratada com o mesmo padrão de fallback
+  dos demais fluxos (mensagem principal sai sem a comparação).
 
 ## R5 — Encoding de URL
 

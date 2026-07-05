@@ -7,7 +7,7 @@ from pathlib import Path
 
 from src.comum.estado import ESTADO_PATH, gravar_estado, ler_estado
 from src.comum.telegram import _sanitizar, enviar_mensagem
-from src.focus_resumo.cliente_expectativas_anuais import buscar_resumo_atual
+from src.focus_resumo.cliente_expectativas_anuais import buscar_datas_recentes, buscar_divulgacao
 from src.focus_resumo.comparador import comparar_valores
 
 logger = logging.getLogger(__name__)
@@ -81,19 +81,43 @@ def _gravar_historico(divulgacao, valores_dict):
     )
 
 
+def _buscar_penultima_com_fallback(datas):
+    """Busca a divulgação penúltima (para a comparação semanal, FR-004).
+    Nunca propaga exceção: a comparação é um enriquecimento da mensagem
+    principal, não pode bloquear o envio do resumo (mesmo padrão de
+    fallback já usado em outros fluxos, ex. composição do IPCA)."""
+    if len(datas) < 2:
+        return None
+    try:
+        return buscar_divulgacao(datas[1])
+    except Exception as exc:
+        logger.warning("Divulgação penúltima indisponível — enviando sem comparação: %s", exc)
+        return None
+
+
 def processar():
     """Executa uma checagem do Resumo Semanal do Focus. Retorna True se
-    uma nova divulgação foi processada e notificada, False caso contrário."""
-    divulgacao = buscar_resumo_atual()
+    uma nova divulgação foi processada e notificada, False caso contrário.
+
+    A comparação semanal (FR-004) sempre busca a divulgação mais recente E
+    a penúltima diretamente da API — nunca depende de valores persistidos
+    de uma execução anterior, que poderiam estar ausentes/desatualizados."""
+    datas = buscar_datas_recentes()
+    atual = buscar_divulgacao(datas[0])
 
     estado_anterior = ler_estado(CHAVE_ESTADO, caminho=ESTADO_PATH)
-    if estado_anterior is not None and estado_anterior.get("data_referencia") == divulgacao.data_referencia:
-        logger.info("Divulgação %s já processada — nada a fazer", divulgacao.data_referencia)
+    if estado_anterior is not None and estado_anterior.get("data_referencia") == atual.data_referencia:
+        logger.info("Divulgação %s já processada — nada a fazer", atual.data_referencia)
         return False
 
-    valores_anteriores = estado_anterior.get("valores", {}) if estado_anterior else {}
-    direcoes = comparar_valores(valores_anteriores, divulgacao.valores)
-    mensagem = _montar_mensagem(divulgacao, direcoes, valores_anteriores)
+    penultima = _buscar_penultima_com_fallback(datas)
+    valores_penultima = (
+        {f"{item.indicador}:{item.ano}": item.valor for item in penultima.valores}
+        if penultima is not None
+        else {}
+    )
+    direcoes = comparar_valores(valores_penultima, atual.valores)
+    mensagem = _montar_mensagem(atual, direcoes, valores_penultima)
 
     token = os.environ.get("FOCUS_TELEGRAM_BOT_TOKEN")
     chat_id = os.environ.get("FOCUS_TELEGRAM_CHAT_ID")
@@ -104,12 +128,12 @@ def processar():
         logger.error("Falha ao enviar resumo semanal do Focus: %s", _sanitizar(str(exc), token))
         raise
 
-    novos_valores = {f"{item.indicador}:{item.ano}": item.valor for item in divulgacao.valores}
+    novos_valores = {f"{item.indicador}:{item.ano}": item.valor for item in atual.valores}
     gravar_estado(
         CHAVE_ESTADO,
-        {"data_referencia": divulgacao.data_referencia, "valores": novos_valores},
+        {"data_referencia": atual.data_referencia, "valores": novos_valores},
         caminho=ESTADO_PATH,
     )
-    _gravar_historico(divulgacao, novos_valores)
+    _gravar_historico(atual, novos_valores)
 
     return True
