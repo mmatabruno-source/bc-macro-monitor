@@ -126,7 +126,7 @@ def _montar_tabela_itens(itens):
 
 
 def _montar_detalhamento(detalhamento):
-    linhas = ["\n*Grupos que mais pressionaram o IPCA para cima:*"]
+    linhas = ["\n*Grupos que mais pressionaram o IPCA para cima*:"]
     for grupo, itens in detalhamento:
         tabela = _montar_tabela_itens(itens)
         linhas.append(
@@ -153,7 +153,7 @@ def _montar_mensagem(mes_anterior, atual, mes_ano_anterior, grupos, detalhamento
     ]
     if grupos is not None:
         tabela = _montar_tabela_grupos(grupos)
-        linhas.append(f"\nComposição por grupo:\n\n```\n{tabela}\n```")
+        linhas.append(f"\n*Composição por grupo*:\n\n```\n{tabela}\n```")
     if detalhamento is not None:
         linhas.append(_montar_detalhamento(detalhamento))
     return "\n".join(linhas)
