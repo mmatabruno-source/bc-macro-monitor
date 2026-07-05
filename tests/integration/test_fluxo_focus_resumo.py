@@ -43,6 +43,9 @@ def test_primeira_divulgacao_sem_direcao(estado_path):
     texto = mock_enviar.call_args.args[0]
     assert "Selic" in texto
     assert "14,00%" in texto
+    assert "Câmbio (BRL/USD)" in texto
+    assert "PIB (var. sobre o ano anterior)" in texto
+    assert "1,990%" in texto
 
     dados = json.loads(estado_path.read_text())
     assert dados["ultimo_resumo_focus"]["data_referencia"] == "2026-06-26"
@@ -63,7 +66,7 @@ def test_nova_divulgacao_mostra_direcao(estado_path):
 
     assert processado is True
     texto = mock_enviar.call_args.args[0]
-    assert "▲ 0,25 p.p." in texto
+    assert "(▲ 0,25 p.p.)" in texto
 
 
 def test_direcao_desceu_e_manteve(estado_path):
@@ -81,8 +84,8 @@ def test_direcao_desceu_e_manteve(estado_path):
 
     assert processado is True
     texto = mock_enviar.call_args.args[0]
-    assert "▼ 0,25 p.p." in texto
-    assert "= 0 p.p." in texto
+    assert "(▼ 0,25 p.p.)" in texto
+    assert "(= 0 p.p.)" in texto
 
 
 def test_mesma_divulgacao_relida_nao_notifica(estado_path):
