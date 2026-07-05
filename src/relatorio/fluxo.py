@@ -19,7 +19,7 @@ HISTORICO_DIR = Path(__file__).resolve().parent.parent.parent / "historico" / "r
 
 def _montar_aviso(atual):
     return (
-        f"📄 *Relatório de Política Monetária ({atual.identificador})*\n"
+        f"📄 *Relatório de Política Monetária ({atual.identificador})*\n\n"
         f"*Link*: {atual.link_pagina}"
     )
 
