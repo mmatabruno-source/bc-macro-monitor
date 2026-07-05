@@ -32,9 +32,8 @@ def _relatorio(identificador="202412"):
 def test_novo_relatorio_envia_aviso_e_analise(estado_path):
     atual = _relatorio()
     analise = AnaliseCritica(
-        cenario_macro="cenário X",
-        projecoes_inflacao="projeções Y",
-        implicacao_portfolio="implicação Z",
+        visao_cidadao="▪️ visão cidadão X",
+        visao_investidor="▪️ visão investidor Y",
     )
 
     with patch("src.relatorio.fluxo.buscar_relatorio_mais_recente", return_value=atual), \
@@ -43,12 +42,11 @@ def test_novo_relatorio_envia_aviso_e_analise(estado_path):
         processado = processar()
 
     assert processado is True
-    assert mock_enviar.call_count == 4
+    assert mock_enviar.call_count == 3
     textos = [chamada.args[0] for chamada in mock_enviar.call_args_list]
     assert any(atual.link_pagina in texto for texto in textos)
-    assert any("cenário X" in texto for texto in textos)
-    assert any("projeções Y" in texto for texto in textos)
-    assert any("implicação Z" in texto for texto in textos)
+    assert any("visão cidadão X" in texto for texto in textos)
+    assert any("visão investidor Y" in texto for texto in textos)
 
     dados = json.loads(estado_path.read_text())
     assert dados["ultimo_relatorio"]["identificador"] == "202412"

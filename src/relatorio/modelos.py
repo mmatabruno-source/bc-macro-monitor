@@ -13,6 +13,5 @@ class RelatorioPoliticaMonetaria:
 
 @dataclass(frozen=True)
 class AnaliseCritica:
-    cenario_macro: str
-    projecoes_inflacao: str
-    implicacao_portfolio: str
+    visao_cidadao: str
+    visao_investidor: str

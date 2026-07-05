@@ -5,7 +5,7 @@
 
 ## Entidade: RelatorioPoliticaMonetaria
 
-| Campo | Tipo | Campo real da API (`sitebcb/ri/relatorios`) | Descrição | Regras |
+| Campo | Tipo | Campo real da API (`sitebcb/rpm/relatorios`) | Descrição | Regras |
 |---|---|---|---|---|
 | `identificador` | string (`"YYYYMM"`) | `identificador` | Identificador único do relatório | Chave de idempotência (FR-002/FR-005) |
 | `data_publicacao` | date | `dataReferencia` | Data em que o relatório foi publicado | Informativo |
@@ -20,14 +20,15 @@
 
 ## Entidade: AnaliseCritica
 
-Resultado da chamada à Claude API com o PDF anexado, contendo os três
-textos usados nas mensagens 2–4 da sequência de notificação:
+Resultado da chamada à Claude API com o PDF anexado, contendo os dois
+textos usados nas mensagens 2–3 da sequência de notificação. Cada texto
+já vem formatado em tópicos curtos, cada um começando com o emoji "▪️"
+(pedido do usuário: visão crítica e direta, sem parágrafos longos):
 
 | Campo | Tipo | Descrição |
 |---|---|---|
-| `cenario_macro` | string | Texto sobre o cenário macroeconômico descrito no relatório |
-| `projecoes_inflacao` | string | Texto sobre as projeções oficiais de inflação |
-| `implicacao_portfolio` | string | Leitura de implicação para decisões de portfólio |
+| `visao_cidadao` | string | Tópicos sobre o que é relevante um cidadão saber, com visão crítica, a partir do relatório |
+| `visao_investidor` | string | Tópicos sobre o que o relatório estimula ou desestimula um investidor pessoa física a fazer |
 
 ## Entidade: SequenciaNotificacaoRelatorio
 
@@ -35,9 +36,8 @@ Conjunto ordenado de mensagens enviadas ao bot dedicado a este fluxo:
 
 1. Aviso de publicação (link `linkPaginaBC` — sempre enviado, mesmo se as
    demais falharem, FR-006)
-2. Cenário macro (`AnaliseCritica.cenario_macro`)
-3. Projeções oficiais de inflação (`AnaliseCritica.projecoes_inflacao`)
-4. Implicação para portfólio (`AnaliseCritica.implicacao_portfolio`)
+2. Visão crítica para o cidadão (`AnaliseCritica.visao_cidadao`)
+3. Visão do investidor (`AnaliseCritica.visao_investidor`)
 
 Se a chamada à Claude API falhar (ex.: PDF muito grande, erro de rede,
 chave inválida), apenas a mensagem 1 é enviada, e a falha é tratada como
