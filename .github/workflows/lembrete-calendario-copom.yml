@@ -1,0 +1,39 @@
+name: Lembrete Anual — Calendário do Copom
+
+on:
+  schedule:
+    # 31/07 de todo ano, 12:00 UTC. O código internamente só envia a
+    # partir de 2027 (PRIMEIRO_ANO em src/lembrete_calendario_copom/fluxo.py)
+    # e é idempotente por ano — não faz mal esse cron já existir antes disso.
+    - cron: "0 12 31 7 *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  lembrete:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Enviar lembrete (se aplicável)
+        env:
+          FOCUS_TELEGRAM_BOT_TOKEN: ${{ secrets.FOCUS_TELEGRAM_BOT_TOKEN }}
+          FOCUS_TELEGRAM_CHAT_ID: ${{ secrets.FOCUS_TELEGRAM_CHAT_ID }}
+        run: python -c "from src.lembrete_calendario_copom.fluxo import processar; processar()"
+
+      - name: Commitar estado atualizado
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add estado.json
+          git diff --cached --quiet || git commit -m "chore: registrar lembrete de calendário do Copom [skip ci]"
+          git push
