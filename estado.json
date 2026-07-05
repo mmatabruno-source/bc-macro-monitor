@@ -1,18 +1,18 @@
 {
   "ultima_expectativa_copom": {
-    "data_referencia": "2026-06-26",
+    "data_referencia": "2026-06-19",
     "mediana_selic": 14.0,
-    "reuniao_id": "R5/2026"
+    "reuniao_id": "R4/2026"
   },
   "ultimo_ipca": {
-    "mes_referencia": "2026-05",
-    "variacao_mensal": 0.58
+    "mes_referencia": "2026-04",
+    "variacao_mensal": 0.67
   },
   "ultimo_relatorio": {
-    "identificador": "202606"
+    "identificador": "202603"
   },
   "ultimo_resumo_focus": {
-    "data_referencia": "2026-06-26",
+    "data_referencia": "2026-06-19",
     "valores": {
       "Câmbio:2026": 5.2,
       "Câmbio:2027": 5.283,
