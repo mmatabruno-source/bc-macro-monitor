@@ -19,7 +19,7 @@ def _duas_datas_mais_recentes():
     url = _montar_url({
         "$filter": "Indicador eq 'IPCA'",
         "$orderby": "Data desc",
-        "$top": "10",
+        "$top": "100",
         "$format": "json",
     })
     resposta = requisitar_com_retry("GET", url)
