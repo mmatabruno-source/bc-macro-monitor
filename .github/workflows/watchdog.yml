@@ -1,0 +1,33 @@
+name: Watchdog do Monitor
+
+on:
+  schedule:
+    # 12:50 UTC = 09:50 BRT, dias úteis — 30min depois do monitor.yml
+    # (09:20 BRT), tempo suficiente pra sua execução diária já ter
+    # aparecido no histórico de runs.
+    - cron: "50 12 * * 1-5"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  checar-monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Verificar saúde do monitor.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WATCHDOG_TELEGRAM_BOT_TOKEN: ${{ secrets.WATCHDOG_TELEGRAM_BOT_TOKEN }}
+          WATCHDOG_TELEGRAM_CHAT_ID: ${{ secrets.WATCHDOG_TELEGRAM_CHAT_ID }}
+        run: python -c "from src.watchdog.fluxo import processar; processar()"
