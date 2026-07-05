@@ -98,6 +98,23 @@ def test_troca_de_reuniao_notifica_com_nova_reuniao(estado_path):
     assert dados["ultima_expectativa_copom"]["reuniao_id"] == "R5/2026"
 
 
+def test_falha_no_envio_ao_telegram_nao_grava_estado(estado_path):
+    """Princípio V (idempotência): se o envio falhar, o estado deve
+    permanecer como "não processado" para a próxima execução tentar de
+    novo — falhar ao notificar nunca pode ser confundido com falhar ao
+    processar."""
+    atual = DivulgacaoFocus(reuniao_id="R5/2026", data_referencia="2026-06-26", mediana_selic=14.0)
+    estado_original = estado_path.read_text()
+
+    with patch("src.focus.fluxo.buscar_proxima_reuniao", return_value=atual), \
+         patch("src.focus.fluxo.buscar_selic_vigente", return_value=14.25), \
+         patch("src.focus.fluxo.enviar_mensagem", side_effect=RuntimeError("Telegram fora do ar")):
+        resultado = _executar_isolado("Focus/Copom", processar)
+
+    assert resultado["falhou"] is True
+    assert estado_path.read_text() == estado_original
+
+
 def test_falha_na_checagem_e_isolada_e_nao_altera_estado(estado_path):
     """US3: exceção durante a checagem não deve corromper/alterar estado.json
     e deve ser isolada via _executar_isolado, sem se propagar para fora."""

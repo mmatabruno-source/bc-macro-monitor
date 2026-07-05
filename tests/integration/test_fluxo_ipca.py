@@ -219,6 +219,24 @@ def test_top3_grupos_selecionados_por_variacao_vezes_peso():
     assert [g.nome for g in top3] == ["B", "E", "A"]
 
 
+def test_falha_no_envio_ao_telegram_nao_grava_estado(estado_path):
+    """Princípio V (idempotência): falha ao notificar não pode ser
+    confundida com falha ao processar — o estado deve permanecer como
+    "não processado" para a próxima execução tentar de novo."""
+    anterior = DivulgacaoIpca(mes_referencia="2026-04", variacao_mensal=0.67)
+    atual = DivulgacaoIpca(mes_referencia="2026-05", variacao_mensal=0.58)
+    estado_original = estado_path.read_text()
+
+    with patch("src.ipca.fluxo.buscar_ultimas_divulgacoes", return_value=[anterior, atual]), \
+         patch("src.ipca.fluxo.buscar_composicao_ipca", return_value=("2026-05", 0.58, GRUPOS_FAKE)), \
+         patch("src.ipca.fluxo.buscar_itens_por_grupo", return_value=("2026-05", ITENS_FAKE)), \
+         patch("src.ipca.fluxo.enviar_mensagem", side_effect=RuntimeError("Telegram fora do ar")):
+        resultado = _executar_isolado("IPCA", processar)
+
+    assert resultado["falhou"] is True
+    assert estado_path.read_text() == estado_original
+
+
 def test_falha_na_checagem_e_isolada_e_nao_altera_estado(estado_path):
     estado_path.write_text(json.dumps({
         "ultimo_ipca": {"mes_referencia": "2026-04", "variacao_mensal": 0.67}

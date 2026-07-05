@@ -81,6 +81,23 @@ def test_falha_na_analise_envia_apenas_aviso(estado_path):
     assert dados["ultimo_relatorio"]["identificador"] == "202412"
 
 
+def test_falha_no_envio_do_aviso_nao_grava_estado(estado_path):
+    """Princípio V (idempotência): se o aviso de publicação (mensagem
+    sempre enviada) falhar, o estado não pode ser gravado como
+    processado — nem a análise crítica deve ser tentada."""
+    atual = _relatorio()
+    estado_original = estado_path.read_text()
+
+    with patch("src.relatorio.fluxo.buscar_relatorio_mais_recente", return_value=atual), \
+         patch("src.relatorio.fluxo.gerar_analise") as mock_gerar_analise, \
+         patch("src.relatorio.fluxo.enviar_mensagem", side_effect=RuntimeError("Telegram fora do ar")):
+        resultado = _executar_isolado("Relatório", processar)
+
+    assert resultado["falhou"] is True
+    assert estado_path.read_text() == estado_original
+    mock_gerar_analise.assert_not_called()
+
+
 def test_falha_na_checagem_do_dataset_e_isolada(estado_path):
     with patch("src.relatorio.fluxo.buscar_relatorio_mais_recente", side_effect=RuntimeError("dataset indisponível")):
         resultado = _executar_isolado("Relatório", processar)

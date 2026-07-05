@@ -88,6 +88,21 @@ def test_direcao_desceu_e_manteve(estado_path):
     assert "(= 0 p.p.)" in texto
 
 
+def test_falha_no_envio_ao_telegram_nao_grava_estado(estado_path):
+    """Princípio V (idempotência): falha ao notificar não pode ser
+    confundida com falha ao processar — o estado deve permanecer como
+    "não processado" para a próxima execução tentar de novo."""
+    atual = _divulgacao("2026-06-26", 14.0)
+    estado_original = estado_path.read_text()
+
+    with patch("src.focus_resumo.fluxo.buscar_resumo_atual", return_value=atual), \
+         patch("src.focus_resumo.fluxo.enviar_mensagem", side_effect=RuntimeError("Telegram fora do ar")):
+        resultado = _executar_isolado("Focus Resumo", processar)
+
+    assert resultado["falhou"] is True
+    assert estado_path.read_text() == estado_original
+
+
 def test_mesma_divulgacao_relida_nao_notifica(estado_path):
     estado_path.write_text(json.dumps({
         "ultimo_resumo_focus": {"data_referencia": "2026-06-26", "valores": {}}
