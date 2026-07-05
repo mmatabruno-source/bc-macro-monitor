@@ -58,9 +58,8 @@ def processar():
     analise_gerada = False
     try:
         analise = gerar_analise(atual.link_pdf)
-        enviar_mensagem(f"📊 Cenário macro\n{analise.cenario_macro}", token, chat_id)
-        enviar_mensagem(f"📈 Projeções oficiais de inflação\n{analise.projecoes_inflacao}", token, chat_id)
-        enviar_mensagem(f"💼 Implicação para portfólio\n{analise.implicacao_portfolio}", token, chat_id)
+        enviar_mensagem(f"🧭 Visão crítica para o cidadão\n{analise.visao_cidadao}", token, chat_id)
+        enviar_mensagem(f"💼 Visão do investidor\n{analise.visao_investidor}", token, chat_id)
         analise_gerada = True
     except Exception as exc:
         # Fallback FR-006: falha na análise não impede que o relatório seja

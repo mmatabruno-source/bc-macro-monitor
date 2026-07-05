@@ -13,24 +13,25 @@ from src.relatorio.modelos import AnaliseCritica
 MODELO = "claude-sonnet-5"
 MAX_TOKENS = 2048
 
-MARCADOR_CENARIO = "### CENARIO_MACRO"
-MARCADOR_PROJECOES = "### PROJECOES_INFLACAO"
-MARCADOR_PORTFOLIO = "### IMPLICACAO_PORTFOLIO"
+MARCADOR_CIDADAO = "### VISAO_CIDADAO"
+MARCADOR_INVESTIDOR = "### VISAO_INVESTIDOR"
 
 PROMPT = f"""\
-Você é um analista de portfólio lendo o Relatório de Política Monetária
-anexado (PDF) do Banco Central do Brasil. Responda em português, em texto
-corrido (sem markdown), organizado EXATAMENTE nas 3 seções abaixo, cada uma
-iniciada por seu marcador em uma linha própria:
+Você é um especialista em investimentos, economia política e macroeconomia,
+lendo o Relatório de Política Monetária anexado (PDF) do Banco Central do
+Brasil. Responda em português, organizado EXATAMENTE nas 2 seções abaixo,
+cada uma iniciada por seu marcador em uma linha própria. Evite parágrafos
+longos e seja direto ao ponto: divida cada seção em tópicos curtos, cada um
+começando com o emoji "▪️" em uma linha própria.
 
-{MARCADOR_CENARIO}
-<parágrafo curto sobre o cenário macroeconômico descrito no relatório>
+{MARCADOR_CIDADAO}
+<tópicos: como cidadão que quer estar ciente do que está acontecendo no
+país, com uma visão bastante crítica, o que é realmente relevante estar
+consciente, a partir deste relatório>
 
-{MARCADOR_PROJECOES}
-<parágrafo curto sobre as projeções oficiais de inflação>
-
-{MARCADOR_PORTFOLIO}
-<parágrafo curto com a leitura de implicação para decisões de portfólio>
+{MARCADOR_INVESTIDOR}
+<tópicos: como investidor pessoa física residente no Brasil, o que esse
+relatório estimula ou desestimula a fazer>
 """
 
 
@@ -48,9 +49,8 @@ def _extrair_secao(texto, marcador, proximo_marcador=None):
 
 def _parse_resposta(texto):
     return AnaliseCritica(
-        cenario_macro=_extrair_secao(texto, MARCADOR_CENARIO, MARCADOR_PROJECOES),
-        projecoes_inflacao=_extrair_secao(texto, MARCADOR_PROJECOES, MARCADOR_PORTFOLIO),
-        implicacao_portfolio=_extrair_secao(texto, MARCADOR_PORTFOLIO),
+        visao_cidadao=_extrair_secao(texto, MARCADOR_CIDADAO, MARCADOR_INVESTIDOR),
+        visao_investidor=_extrair_secao(texto, MARCADOR_INVESTIDOR),
     )
 
 

@@ -1,29 +1,26 @@
 from unittest.mock import MagicMock, patch
 
-from src.relatorio.gerador_analise import MARCADOR_CENARIO, MARCADOR_PORTFOLIO, MARCADOR_PROJECOES, _parse_resposta, gerar_analise
+from src.relatorio.gerador_analise import MARCADOR_CIDADAO, MARCADOR_INVESTIDOR, _parse_resposta, gerar_analise
 
 
-def test_parse_resposta_extrai_as_tres_secoes():
+def test_parse_resposta_extrai_as_duas_secoes():
     texto = (
-        f"{MARCADOR_CENARIO}\nO cenário está X.\n\n"
-        f"{MARCADOR_PROJECOES}\nAs projeções indicam Y.\n\n"
-        f"{MARCADOR_PORTFOLIO}\nPara portfólio, isso significa Z."
+        f"{MARCADOR_CIDADAO}\n▪️ Tópico cidadão X.\n\n"
+        f"{MARCADOR_INVESTIDOR}\n▪️ Tópico investidor Y."
     )
 
     analise = _parse_resposta(texto)
 
-    assert analise.cenario_macro == "O cenário está X."
-    assert analise.projecoes_inflacao == "As projeções indicam Y."
-    assert analise.implicacao_portfolio == "Para portfólio, isso significa Z."
+    assert analise.visao_cidadao == "▪️ Tópico cidadão X."
+    assert analise.visao_investidor == "▪️ Tópico investidor Y."
 
 
 @patch("src.relatorio.gerador_analise.anthropic.Anthropic")
 @patch("src.relatorio.gerador_analise._baixar_pdf", return_value=b"conteudo-pdf-fake")
 def test_gerar_analise_chama_claude_com_documento_pdf(mock_baixar, mock_anthropic_cls):
     texto_resposta = (
-        f"{MARCADOR_CENARIO}\nCenário.\n"
-        f"{MARCADOR_PROJECOES}\nProjeções.\n"
-        f"{MARCADOR_PORTFOLIO}\nPortfólio."
+        f"{MARCADOR_CIDADAO}\n▪️ Cidadão.\n"
+        f"{MARCADOR_INVESTIDOR}\n▪️ Investidor."
     )
     mock_cliente = MagicMock()
     mock_cliente.messages.create.return_value = MagicMock(
@@ -33,7 +30,7 @@ def test_gerar_analise_chama_claude_com_documento_pdf(mock_baixar, mock_anthropi
 
     analise = gerar_analise("https://exemplo.com/relatorio.pdf")
 
-    assert analise.cenario_macro == "Cenário."
+    assert analise.visao_cidadao == "▪️ Cidadão."
     mock_baixar.assert_called_once_with("https://exemplo.com/relatorio.pdf")
 
     chamada = mock_cliente.messages.create.call_args
