@@ -63,7 +63,26 @@ def test_nova_divulgacao_mostra_direcao(estado_path):
 
     assert processado is True
     texto = mock_enviar.call_args.args[0]
-    assert "subiu" in texto.lower()
+    assert "▲ 0,25 p.p." in texto
+
+
+def test_direcao_desceu_e_manteve(estado_path):
+    estado_path.write_text(json.dumps({
+        "ultimo_resumo_focus": {
+            "data_referencia": "2026-06-19",
+            "valores": {"IPCA:2026": 5.33, "Selic:2026": 14.25, "Câmbio:2026": 5.20, "PIB Total:2026": 1.99},
+        }
+    }))
+    atual = _divulgacao("2026-06-26", 14.0)
+
+    with patch("src.focus_resumo.fluxo.buscar_resumo_atual", return_value=atual), \
+         patch("src.focus_resumo.fluxo.enviar_mensagem") as mock_enviar:
+        processado = processar()
+
+    assert processado is True
+    texto = mock_enviar.call_args.args[0]
+    assert "▼ 0,25 p.p." in texto
+    assert "= 0 p.p." in texto
 
 
 def test_mesma_divulgacao_relida_nao_notifica(estado_path):
