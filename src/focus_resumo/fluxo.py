@@ -20,8 +20,8 @@ ORDEM_INDICADORES = ["IPCA", "Selic", "Câmbio", "PIB Total"]
 CONFIG_INDICADOR = {
     "IPCA": {"emoji": "🛒", "titulo": "IPCA (a.a.)", "casas": 2, "sufixo": "%"},
     "Selic": {"emoji": "📊", "titulo": "Selic (a.a.)", "casas": 2, "sufixo": "%"},
-    "Câmbio": {"emoji": "💲", "titulo": "Câmbio (R$/US$)", "casas": 3, "sufixo": ""},
-    "PIB Total": {"emoji": "📦", "titulo": "PIB (var. % sobre o ano anterior)", "casas": 3, "sufixo": ""},
+    "Câmbio": {"emoji": "💲", "titulo": "Câmbio (BRL/USD)", "casas": 3, "sufixo": ""},
+    "PIB Total": {"emoji": "📦", "titulo": "PIB (var. sobre o ano anterior)", "casas": 3, "sufixo": "%"},
 }
 
 
@@ -33,10 +33,10 @@ def _texto_direcao(direcao, delta, casas):
     if direcao is None:
         return ""
     if direcao == "subiu":
-        return f" ▲ {_fmt(delta, casas)} p.p."
+        return f" (▲ {_fmt(delta, casas)} p.p.)"
     if direcao == "desceu":
-        return f" ▼ {_fmt(abs(delta), casas)} p.p."
-    return " = 0 p.p."
+        return f" (▼ {_fmt(abs(delta), casas)} p.p.)"
+    return " (= 0 p.p.)"
 
 
 def _montar_mensagem(divulgacao, direcoes, valores_anteriores):
