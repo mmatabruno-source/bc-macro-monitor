@@ -21,7 +21,7 @@ def _montar_mensagem(ano_seguinte):
     return (
         f"🗓️ *Lembrete anual*\n\n"
         f"Colete o calendário oficial de reuniões do Copom para {ano_seguinte} "
-        f"(BC costuma publicar por volta desta época) e cole aqui no chat com "
+        f"(BC costuma publicar no final de Junho) e cole no chat com "
         f"o Claude Code, para atualizar `src/focus/calendario_copom.py`."
     )
 
