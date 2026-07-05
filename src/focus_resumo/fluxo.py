@@ -17,20 +17,38 @@ HISTORICO_DIR = Path(__file__).resolve().parent.parent.parent / "historico" / "f
 
 TEXTO_DIRECAO = {"subiu": " (subiu)", "desceu": " (desceu)", "manteve": " (manteve)", None: ""}
 
+ORDEM_INDICADORES = ["IPCA", "Selic", "Câmbio", "PIB Total"]
+
+CONFIG_INDICADOR = {
+    "IPCA": {"emoji": "🛒", "titulo": "IPCA (a.a.)", "casas": 2, "sufixo": "%"},
+    "Selic": {"emoji": "📊", "titulo": "Selic (a.a.)", "casas": 2, "sufixo": "%"},
+    "Câmbio": {"emoji": "💲", "titulo": "Câmbio (R$/US$)", "casas": 3, "sufixo": ""},
+    "PIB Total": {"emoji": "📦", "titulo": "PIB (var. % sobre o ano anterior)", "casas": 3, "sufixo": ""},
+}
+
+
+def _fmt(valor, casas):
+    return f"{valor:.{casas}f}".replace(".", ",")
+
 
 def _montar_mensagem(divulgacao, direcoes):
-    linhas = [f"📋 Resumo Focus — {divulgacao.data_referencia}"]
+    linhas = [f"📋 *Resumo Focus — {divulgacao.data_referencia}*"]
 
     por_indicador = {}
     for item in divulgacao.valores:
         por_indicador.setdefault(item.indicador, []).append(item)
 
-    for indicador, itens in por_indicador.items():
-        linhas.append(f"\n{indicador}")
+    for indicador in ORDEM_INDICADORES:
+        itens = por_indicador.get(indicador)
+        if not itens:
+            continue
+        config = CONFIG_INDICADOR[indicador]
+        linhas.append(f"\n{config['emoji']} *{config['titulo']}*")
         for item in sorted(itens, key=lambda i: i.ano):
             chave = f"{item.indicador}:{item.ano}"
             direcao = direcoes.get(chave)
-            linhas.append(f"  {item.ano}: {item.valor}{TEXTO_DIRECAO[direcao]}")
+            valor_fmt = _fmt(item.valor, config["casas"])
+            linhas.append(f"▪️ *{item.ano}*: {valor_fmt}{config['sufixo']}{TEXTO_DIRECAO[direcao]}")
 
     return "\n".join(linhas)
 
