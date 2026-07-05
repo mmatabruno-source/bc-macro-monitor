@@ -1,11 +1,18 @@
 """Cliente HTTP do dataset de Relatórios de Política Monetária, conforme
 specs/002-relatorio-politica-monetaria/contracts/relatorio-dataset.md
-(verificado com payload real)."""
+(verificado com payload real).
+
+O relatório foi renomeado de "Relatório de Inflação" para "Relatório de
+Política Monetária" (RPM) a partir da edição 202503; o dataset antigo
+(`ri/relatorios`) parou de receber itens novos e ficou parado em 202412
+(a última edição sob o nome antigo) — descoberto em produção quando o
+fluxo continuou "avisando" sobre o mesmo relatório de dez/2024 mesmo
+meses depois. O dataset novo (`rpm/relatorios`) tem o mesmo schema."""
 
 from src.comum.http_retry import requisitar_com_retry
 from src.relatorio.modelos import RelatorioPoliticaMonetaria
 
-BASE_URL = "https://www.bcb.gov.br/api/servico/sitebcb/ri/relatorios"
+BASE_URL = "https://www.bcb.gov.br/api/servico/sitebcb/rpm/relatorios"
 
 
 def _parse_relatorios(payload):

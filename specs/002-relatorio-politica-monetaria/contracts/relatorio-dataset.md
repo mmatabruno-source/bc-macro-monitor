@@ -1,17 +1,37 @@
 # Contrato: Dataset de Relatórios de Política Monetária
 
 **Status**: ✅ Verificado por chamada de teste real em 2026-07-03.
+**Atualização (2026-07-05)**: endpoint corrigido de `ri/relatorios` para
+`rpm/relatorios` — ver "Correção: renomeação do relatório" abaixo.
 
 ## Endpoint
 
 ```
-GET https://www.bcb.gov.br/api/servico/sitebcb/ri/relatorios?quantidade=N
+GET https://www.bcb.gov.br/api/servico/sitebcb/rpm/relatorios?quantidade=N
 ```
 
-## Payload real observado (`quantidade=5`)
+## Correção: renomeação do relatório (2026-07-05)
+
+O documento foi renomeado de "Relatório de Inflação" para "Relatório de
+Política Monetária" (RPM) a partir da edição de mar/2025 (202503). O
+endpoint original deste contrato (`ri/relatorios`) é especificamente o
+dataset do nome antigo e **parou de receber itens novos** — ficou
+travado em `202412` (dez/2024, a última edição sob o nome antigo).
+
+Isso só foi percebido em produção: o fluxo continuava "avisando" sobre o
+relatório de dez/2024 mesmo meses depois, porque `identificador` (chave
+de idempotência) nunca mudava — não era um bug de comparação, era a
+fonte de dados que tinha parado de ser atualizada. Confirmado via
+chamada de teste real (`https://www.bcb.gov.br/publicacoes/rpm`, que
+lista os RPMs mais recentes) e testando o endpoint irmão
+`rpm/relatorios`, que respondeu com o item correto (`202606`,
+referência 2026-06-25) e o mesmo schema do dataset antigo — só o
+segmento `ri` → `rpm` na URL muda.
+
+## Payload real observado (`quantidade=5`, endpoint `rpm/relatorios`)
 
 ```json
-{"conteudo":[{"url":"https://www.bcb.gov.br/content/ri/relatorioinflacao/202412/ri202412p.pdf","linkPaginaBC":"https://www.bcb.gov.br/publicacoes/ri/202412","identificador":"202412","dataReferencia":"2024-12-19","issn":"ISSN 1517-6576","edicao":"4","volume":"26","descricao":"..."}, ...]}
+{"conteudo":[{"url":"https://www.bcb.gov.br/content/ri/relatorioinflacao/202606/rpm202606p.pdf","linkPaginaBC":"https://www.bcb.gov.br/publicacoes/rpm/202606","identificador":"202606","dataReferencia":"2026-06-25","issn":"ISSN 1517-6576","edicao":"2","volume":"2","descricao":"..."}, ...]}
 ```
 
 ## Schema
@@ -63,8 +83,14 @@ relatório diretamente sem depender de parsing de data.
   verificado; não é necessário para este fluxo, que usa apenas a API de
   relatórios já publicados como fonte de verdade (Princípio VI).
 
-## Evidência (payload bruto)
+## Evidência (payload bruto, dataset antigo `ri/relatorios`, congelado em 202412)
 
 ```json
 {"conteudo":[{"url":"https://www.bcb.gov.br/content/ri/relatorioinflacao/202412/ri202412p.pdf","linkPaginaBC":"https://www.bcb.gov.br/publicacoes/ri/202412","identificador":"202412","dataReferencia":"2024-12-19","issn":"ISSN 1517-6576","edicao":"4","volume":"26","descricao":"O relatório de inflação apresenta as diretrizes das políticas adotadas pelo Copom, considerações acerca da evolução recente do cenário econômico e projeções para a inflação. As projeções são apresentadas em cenários com condicionantes para algumas variáveis econômicas. O Copom utiliza um conjunto amplo de modelos e cenários para orientar suas decisões de política monetária. Ao expor alguns desses cenários, o Copom procura dar maior transparência às decisões de política monetária, contribuindo para sua eficácia no controle da inflação, que é seu objetivo precípuo."},{"url":"https://www.bcb.gov.br/content/ri/relatorioinflacao/202409/ri202409p.pdf","linkPaginaBC":"https://www.bcb.gov.br/publicacoes/ri/202409","identificador":"202409","dataReferencia":"2024-09-26","issn":"ISSN 1517-6576","edicao":"3","volume":"26","descricao":"..."},{"url":"https://www.bcb.gov.br/content/ri/relatorioinflacao/202406/ri202406p.pdf","linkPaginaBC":"https://www.bcb.gov.br/publicacoes/ri/202406","identificador":"202406","dataReferencia":"2024-06-27","issn":"ISSN 1517-6576","edicao":"2","volume":"26","descricao":"..."},{"url":"https://www.bcb.gov.br/content/ri/relatorioinflacao/202403/ri202403p.pdf","linkPaginaBC":"https://www.bcb.gov.br/publicacoes/ri/202403","identificador":"202403","dataReferencia":"2024-03-28","issn":"ISSN 1517-6576","edicao":"1","volume":"26","descricao":"..."},{"url":"https://www.bcb.gov.br/content/ri/relatorioinflacao/202312/ri202312p.pdf","linkPaginaBC":"https://www.bcb.gov.br/publicacoes/ri/202312","identificador":"202312","dataReferencia":"2023-12-21","issn":"ISSN 1517-6576","edicao":"4","volume":"25","descricao":"..."}]}
+```
+
+## Evidência (payload bruto, dataset atual `rpm/relatorios`, fixture usada nos testes)
+
+```json
+{"conteudo":[{"url":"https://www.bcb.gov.br/content/ri/relatorioinflacao/202606/rpm202606p.pdf","linkPaginaBC":"https://www.bcb.gov.br/publicacoes/rpm/202606","identificador":"202606","dataReferencia":"2026-06-25","issn":"ISSN 1517-6576","edicao":"2","volume":"2","descricao":"..."},{"url":"https://www.bcb.gov.br/content/ri/relatorioinflacao/202603/rpm202603p.pdf","linkPaginaBC":"https://www.bcb.gov.br/publicacoes/rpm/202603","identificador":"202603","dataReferencia":"2026-03-26","issn":"ISSN 1517-6576","edicao":"1","volume":"2","descricao":"..."},{"url":"https://www.bcb.gov.br/content/ri/relatorioinflacao/202512/rpm202512p.pdf","linkPaginaBC":"https://www.bcb.gov.br/publicacoes/rpm/202512","identificador":"202512","dataReferencia":"2025-12-18","issn":"ISSN 1517-6576","edicao":"4","volume":"1","descricao":"..."},{"url":"https://www.bcb.gov.br/content/ri/relatorioinflacao/202509/rpm202509p.pdf","linkPaginaBC":"https://www.bcb.gov.br/publicacoes/rpm/202509","identificador":"202509","dataReferencia":"2025-09-25","issn":"ISSN 1517-6576","edicao":"3","volume":"1","descricao":"..."},{"url":"https://www.bcb.gov.br/content/ri/relatorioinflacao/202506/rpm202506p.pdf","linkPaginaBC":"https://www.bcb.gov.br/publicacoes/rpm/202506","identificador":"202506","dataReferencia":"2025-06-26","issn":"ISSN 1517-6576","edicao":"2","volume":"1","descricao":"..."}]}
 ```
