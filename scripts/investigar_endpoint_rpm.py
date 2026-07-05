@@ -7,28 +7,15 @@ nada ao Telegram. Remover após o uso."""
 
 import requests
 
-CANDIDATOS = [
-    "https://www.bcb.gov.br/api/servico/sitebcb/rpm/relatorios?quantidade=5",
-    "https://www.bcb.gov.br/api/servico/sitebcb/ri/relatorios?quantidade=5",
-    "https://www.bcb.gov.br/api/servico/sitebcb/relatoriopoliticamonetaria/relatorios?quantidade=5",
-    "https://www.bcb.gov.br/api/servico/sitebcb/politicamonetaria/rpm?quantidade=5",
-    "https://www.bcb.gov.br/publicacoes/rpm",
-]
+URL = "https://www.bcb.gov.br/api/servico/sitebcb/rpm/relatorios?quantidade=5"
 
 
 def main():
-    for url in CANDIDATOS:
-        print("=" * 80)
-        print("URL:", url)
-        try:
-            resposta = requests.get(url, timeout=20)
-            print("Status:", resposta.status_code)
-            print("Content-Type:", resposta.headers.get("Content-Type"))
-            texto = resposta.text
-            print("Primeiros 2000 chars:")
-            print(texto[:2000])
-        except Exception as exc:
-            print("ERRO:", repr(exc))
+    print("URL:", URL)
+    resposta = requests.get(URL, timeout=20)
+    print("Status:", resposta.status_code)
+    print("PAYLOAD COMPLETO:")
+    print(resposta.text)
 
 
 if __name__ == "__main__":
