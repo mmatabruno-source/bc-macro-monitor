@@ -14,8 +14,9 @@
 ## R3 — Anos a exibir
 
 - **Status**: ✅ Resolvido, decisão direta do usuário: ano corrente da
-  execução + 4 anos seguintes (5 no total), calculado dinamicamente
-  (`datetime.now().year` até `+4`), nunca uma lista fixa.
+  execução + 3 anos seguintes (4 no total — reduzido de 5 em 2026-07-05,
+  trilha leve, por pedido do usuário), calculado dinamicamente
+  (`datetime.now().year` até `+3`), nunca uma lista fixa.
 
 ## R4 — Comparação semanal
 
@@ -31,6 +32,19 @@
   produção no fluxo 001 (T030): usar `urlencode(..., quote_via=quote)` em
   vez de `params=` do `requests`, para evitar `+` em vez de `%20` e o
   consequente 400 Bad Request.
+
+## R6 — Reformatação da direção: texto → seta + p.p. (trilha leve)
+
+- **Status**: ✅ Resolvido em 2026-07-05, decisão direta do usuário.
+- **Decision**: a indicação de direção deixou de ser texto
+  "(subiu)/(desceu)/(manteve)" e virou seta com a magnitude da variação
+  entre parênteses: `(▲ X,XX p.p.)` / `(▼ X,XX p.p.)` / `(= 0 p.p.)` —
+  sempre com a unidade `p.p.` presente, mesmo quando não há mudança.
+  Títulos de indicador ganharam a unidade explícita (`IPCA (a.a.)`,
+  `Selic (a.a.)`, `Câmbio (BRL/USD)`, `PIB (var. sobre o ano anterior)`),
+  e o PIB ganhou sufixo `%` nos valores.
+- **Rationale**: decisão de produto do usuário, buscando um formato mais
+  direto/visual do que texto entre parênteses sem magnitude.
 
 ## Resumo de bloqueios para a Phase 1
 

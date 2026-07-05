@@ -29,15 +29,34 @@ Representa o valor do IPCA de um mês específico.
 3. **Mês registrado → Sem mudança**: mesmo `mes_referencia` → nenhuma ação
    (idempotência, FR-005).
 
-## Entidade: LeituraImpactoIpca
+## Entidade: LeituraImpactoIpca *(substituída, ver Atualização abaixo)*
 
-Texto curto anexado à notificação, gerado por regra determinística
-(FR-009, R4 em research.md):
+> **Atualização (2026-07-05, trilha leve — ver research.md, entrada
+> equivalente a R5/R6 do fluxo 002)**: a leitura qualitativa descrita
+> abaixo (acelerou/desacelerou, acima/abaixo da meta) foi substituída por
+> valores numéricos explícitos, por decisão do usuário. `src/ipca/leitura_impacto.py`
+> hoje só expõe `META_INFLACAO_CENTRO` (constante) e
+> `calcular_variacao_anualizada` (juros compostos:
+> `((1 + variacao_mensal/100)^12 - 1) * 100`) — nenhum enum de direção é
+> gerado ou enviado.
+
+## Entidade: GrupoIpca
+
+Representa a variação/peso de um grupo (nível grupo, 9 grupos oficiais)
+ou de um item (nível item, dentro de um grupo) do IPCA — mesmo formato
+reaproveitado para os dois níveis.
 
 | Campo | Tipo | Descrição |
 |---|---|---|
-| `direcao_vs_mes_anterior` | enum: `acelerou` \| `desacelerou` \| `estavel` | Comparação com `variacao_mensal` do mês anterior processado |
-| `posicao_vs_meta` | enum: `acima` \| `abaixo` \| `em_linha` | Comparação com o centro da meta de inflação vigente (constante, ver research.md R3) |
+| `nome` | string | Nome do grupo ou item |
+| `variacao_mensal` | number | Variação percentual do grupo/item no mês |
+| `peso_mensal` | number | Peso do grupo/item na composição do IPCA do mês |
+
+- **Contribuição** (não é campo do modelo, calculada): `variacao_mensal × peso_mensal` — usada para ranquear a tabela de composição por grupo e para selecionar os 3 grupos que mais pressionaram o IPCA para cima (só grupos com `variacao_mensal > 0` entram no ranking de seleção).
+- Fonte: IBGE (tabela SIDRA 7060, `servicodados.ibge.gov.br`) — fonte
+  secundária e historicamente instável, ver
+  `decisoes/composicao-ipca-por-grupo.md`. Falha nessa busca nunca bloqueia
+  a notificação principal (FR-003a).
 
 ## Entidade: NotificacaoIpca
 
@@ -46,5 +65,10 @@ Mensagem única enviada ao bot dedicado ao fluxo IPCA.
 | Campo | Tipo | Descrição |
 |---|---|---|
 | `mes_referencia` | string | Mês a que a notificação se refere |
-| `variacao_mensal` | number | Número objetivo do mês |
-| `leitura_impacto` | `LeituraImpactoIpca` | Frase curta gerada pela regra determinística |
+| `variacao_mensal` | number | Variação mensal do mês atual |
+| `mes_anterior` | number | Variação mensal do mês anterior |
+| `mes_ano_anterior` | number \| None | Variação do mesmo mês no ano anterior, se disponível (série de 13 meses) |
+| `variacao_anualizada` | number | Projeção anualizada por juros compostos |
+| `meta_inflacao` | number | Meta de inflação vigente (constante) |
+| `composicao_por_grupo` | list[GrupoIpca] \| None | Tabela dos 9 grupos oficiais, ranqueada por contribuição; `None` se a busca falhar ou o mês divergir (fallback) |
+| `detalhamento_top3` | list[(GrupoIpca, list[GrupoIpca])] \| None | Os 3 grupos com maior contribuição positiva, cada um com a lista de seus itens; `None` se não houver grupo positivo ou se a busca de itens falhar/divergir |

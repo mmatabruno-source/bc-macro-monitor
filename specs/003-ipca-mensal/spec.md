@@ -126,8 +126,17 @@ que `estado.json` não é alterado para este fluxo.
   `estado.json`.
 - **FR-003**: O sistema MUST enviar, ao detectar um novo valor mensal, uma
   notificação ao bot do Telegram dedicado a este fluxo, contendo o número
-  objetivo (variação mensal, e outros valores relevantes disponíveis na
-  mesma série) e uma leitura curta de impacto para portfólio.
+  objetivo (variação mensal, mês anterior, mês do ano anterior quando
+  disponível), a variação anualizada por juros compostos e a meta de
+  inflação vigente — todos como valores numéricos explícitos (ver
+  Atualização abaixo; substitui a leitura qualitativa original desta FR).
+- **FR-003a** *(adicionada 2026-07-04/05, trilha leve — ver `research.md`
+  R5/R6)*: o sistema MAY enriquecer a notificação com a composição do
+  IPCA por grupo (9 grupos oficiais, variação/peso/contribuição) e com o
+  detalhamento por item dos 3 grupos que mais contribuíram positivamente
+  (`variação × peso`), buscados de fonte adicional (IBGE). Falha nessa
+  fonte adicional MUST NUNCA bloquear a notificação principal (FR-003) —
+  mesmo padrão de fallback do FR-006.
 - **FR-004**: O sistema MUST registrar o novo valor mensal como processado
   em `estado.json` SOMENTE depois que a notificação for confirmada como
   enviada com sucesso.
@@ -145,11 +154,14 @@ que `estado.json` não é alterado para este fluxo.
   calendário estimado de datas de divulgação (calendário pode, no máximo,
   informar que a checagem pode ser feita com frequência reduzida fora da
   janela usual de divulgação, nunca decidir se a checagem ocorre).
-- **FR-009**: A geração da leitura de impacto para portfólio MUST usar
-  formatação direta baseada em regras determinísticas (sem LLM),
-  comparando o valor do mês com o valor do mês anterior (acelerou/
-  desacelerou) e com o centro da meta de inflação vigente
-  (acima/abaixo/em linha), sem depender de nenhuma chave de API de LLM.
+- **FR-009**: A montagem da mensagem MUST usar formatação direta baseada em
+  regras determinísticas (sem LLM) — variação anualizada por juros
+  compostos e comparação numérica explícita com a meta de inflação
+  vigente, sem depender de nenhuma chave de API de LLM. *(Atualizado
+  2026-07-05, trilha leve: a leitura qualitativa original desta FR
+  — "acelerou/desacelerou", "acima/abaixo/em linha" — foi substituída por
+  valores explícitos por decisão do usuário, mantendo a restrição de não
+  usar LLM.)*
 
 ### Key Entities *(include if feature involves data)*
 

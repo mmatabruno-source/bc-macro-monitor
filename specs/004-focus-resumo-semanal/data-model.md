@@ -2,6 +2,12 @@
 
 > Mapeamento confirmado contra `contracts/expectativas-anuais.md`.
 
+> **Atualização (2026-07-05, trilha leve)**: reduzido de 5 para 4 anos
+> (ano corrente + 3 seguintes); direção deixou de ser enum
+> subiu/desceu/manteve exibido como texto e virou seta + magnitude em
+> p.p. entre parênteses; títulos de indicador ganharam unidade explícita
+> e PIB ganhou sufixo `%`. Ver `research.md` e `spec.md` (nota no topo).
+
 ## Entidade: ValorIndicadorAno
 
 | Campo | Tipo | Campo real da API | Descrição |
@@ -15,7 +21,7 @@
 | Campo | Tipo | Descrição |
 |---|---|---|
 | `data_referencia` | string (`"YYYY-MM-DD"`) | Campo `Data` da divulgação — chave de idempotência (FR-002/FR-008) |
-| `valores` | list[ValorIndicadorAno] | 4 indicadores × 5 anos (até 20 itens; menos se algum ano não vier na resposta) |
+| `valores` | list[ValorIndicadorAno] | 4 indicadores × 4 anos (até 16 itens; menos se algum ano não vier na resposta) |
 
 ## Entidade: RegistroEstadoFocusResumo (chave `ultimo_resumo_focus` em `estado.json`)
 
@@ -29,7 +35,7 @@
    sem indicação de direção (FR-005).
 2. **Registro existente → Nova divulgação**: `Data` mais recente que a
    registrada → mensagem com direção por (indicador, ano) presente no
-   registro anterior; itens novos (ex.: ano que entrou na janela de 5
+   registro anterior; itens novos (ex.: ano que entrou na janela de 4
    anos) aparecem sem direção.
 3. **Registro existente → Sem mudança**: mesma `Data` → nenhuma ação
    (FR-008).
@@ -41,6 +47,11 @@ Mensagem única enviada ao bot do fluxo Focus.
 | Campo | Tipo | Descrição |
 |---|---|---|
 | `data_referencia` | string | Data da divulgação |
-| `linhas` | list | Para cada indicador: nome + lista de (ano, valor, direção\|None) |
+| `linhas` | list | Para cada indicador: emoji + título com unidade (ex.: `IPCA (a.a.)`, `Câmbio (BRL/USD)`, `PIB (var. sobre o ano anterior)`) + lista de (ano, valor, direção\|None) |
 
-`direção` ∈ {`subiu`, `desceu`, `manteve`, `None` (sem histórico anterior)}.
+`direção` é calculada internamente como enum `subiu`/`desceu`/`manteve`/`None`
+(sem histórico anterior), mas **exibida** na mensagem como seta + magnitude
+em p.p. entre parênteses: `(▲ X,XX p.p.)` (subiu), `(▼ X,XX p.p.)` (desceu),
+`(= 0 p.p.)` (manteve), ou nada (sem histórico). Casas decimais: 2 para
+IPCA/Selic (com sufixo `%`), 3 para Câmbio/PIB (PIB também com sufixo `%`,
+Câmbio sem sufixo).

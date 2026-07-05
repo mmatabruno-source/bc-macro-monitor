@@ -9,6 +9,18 @@ description: "Task list for feature 003-ipca-mensal"
 
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md
 
+> **Nota (2026-07-05, trilha leve)**: as tasks abaixo cobrem só a
+> implementação original (mês/valor + leitura qualitativa). A composição
+> por grupo, o detalhamento por item dos top-3 grupos e a substituição da
+> leitura qualitativa por valores explícitos (variação anualizada + meta)
+> foram implementados depois, por edição direta — ver `research.md` e
+> `decisoes/composicao-ipca-por-grupo.md` para o registro completo, e
+> `data-model.md`/`spec.md` (FR-003a) para o estado atual. Sem `tasks.md`
+> formal para essas adições — cobertas por
+> `tests/contract/test_contrato_ipca_composicao.py`,
+> `test_contrato_ipca_itens.py` e os testes de
+> `tests/integration/test_fluxo_ipca.py`.
+
 **Tests**: Incluídos — idempotência e a regra de leitura de impacto justificam testes desde já.
 
 **Organization**: Tarefas agrupadas por user story (US1, US2, US3), com Setup, Foundational (mínima, reaproveita `src/comum/` do fluxo 001) e Polish.

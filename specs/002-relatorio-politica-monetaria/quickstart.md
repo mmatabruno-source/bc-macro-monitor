@@ -14,8 +14,9 @@
 1. **Novo relatório detectado, análise completa gerada com sucesso**
    - Rodar `src/relatorio/fluxo.py` com `estado.json` sem `ultimo_relatorio`,
      usando uma fixture simulada com conteúdo completo.
-   - Esperado: sequência de 4 mensagens enviada (aviso, cenário, projeções,
-     portfólio); `estado.json` atualizado após confirmação.
+   - Esperado: sequência de 3 mensagens enviada (aviso, visão do cidadão, visão do
+     investidor — ver research.md R6); `estado.json` atualizado após
+     confirmação.
 
 2. **Relatório já processado (idempotência)**
    - Rodar novamente com a mesma fixture do cenário 1.
@@ -33,5 +34,6 @@
 4. **Chamada real ao dataset e à Claude API**
    - Rodar `src/relatorio/cliente_dataset.py` e `src/relatorio/gerador_analise.py`
      contra os dados reais (dataset + PDF + Claude API) e confirmar que a
-     sequência completa de 4 mensagens é gerada corretamente para o
-     relatório mais recente publicado.
+     sequência completa de 3 mensagens é gerada corretamente para o
+     relatório mais recente publicado (endpoint `rpm/relatorios` — ver
+     research.md R5).

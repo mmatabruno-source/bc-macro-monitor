@@ -4,18 +4,34 @@
 
 **Input**: Feature specification from `/specs/002-relatorio-politica-monetaria/spec.md`
 
+> **Atualização (2026-07-05, trilha leve)**: dois pontos deste plano ficaram
+> desatualizados por ajustes feitos após a implementação inicial, sem
+> passar pelo pipeline completo — ver `research.md` para o registro
+> completo de cada mudança:
+> 1. O endpoint do dataset mudou de `sitebcb/ri/relatorios` para
+>    `sitebcb/rpm/relatorios` (o documento foi renomeado de "Relatório de
+>    Inflação" para "Relatório de Política Monetária" e o dataset antigo
+>    parou de receber itens novos).
+> 2. A análise crítica foi reformulada de 3 seções/4 mensagens (cenário
+>    macro, projeções de inflação, implicação para portfólio) para 2
+>    seções/3 mensagens (visão crítica para o cidadão, visão do
+>    investidor pessoa física), por pedido do usuário.
+> O restante deste documento (arquitetura, Constitution Check, decisões de
+> design) permanece válido.
+
 ## Summary
 
 Checagem periódica (GitHub Actions cron, diária) do dataset oficial de
-Relatórios de Política Monetária (`sitebcb/ri/relatorios`). Ao detectar um
-relatório novo (`identificador` ainda não registrado em `estado.json`), o
-sistema baixa o PDF do relatório e o envia como documento nativo à Claude
-API para gerar a análise crítica (cenário macro, projeções oficiais de
-inflação, implicação para portfólio), então envia uma sequência de
-mensagens ao bot dedicado a este fluxo: aviso de publicação com link,
-seguido das 3 mensagens de análise. Se a análise falhar, ao menos o aviso
-de publicação é enviado (FR-006). Estado só é atualizado após confirmação
-de envio bem-sucedido; falhas são isoladas deste fluxo.
+Relatórios de Política Monetária (`sitebcb/rpm/relatorios` — ver nota de
+atualização acima). Ao detectar um relatório novo (`identificador` ainda
+não registrado em `estado.json`), o sistema baixa o PDF do relatório e o
+envia como documento nativo à Claude API para gerar a análise crítica
+(visão crítica para o cidadão + visão do investidor pessoa física — ver
+nota de atualização acima), então envia uma sequência de mensagens ao bot
+dedicado a este fluxo: aviso de publicação com link, seguido das 2
+mensagens de análise. Se a análise falhar, ao menos o aviso de publicação
+é enviado (FR-006). Estado só é atualizado após confirmação de envio
+bem-sucedido; falhas são isoladas deste fluxo.
 
 ## Technical Context
 
