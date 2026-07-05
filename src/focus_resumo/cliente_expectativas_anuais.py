@@ -24,7 +24,7 @@ def _montar_url(params):
 
 def _anos_padrao():
     ano_corrente = datetime.now().year
-    return [str(ano_corrente + offset) for offset in range(5)]
+    return [str(ano_corrente + offset) for offset in range(4)]
 
 
 def _parse_valores(linhas, anos):
@@ -58,7 +58,7 @@ def _data_mais_recente():
 
 def buscar_resumo_atual():
     """Consulta a API e retorna a DivulgacaoFocusResumo mais recente, com
-    os 4 indicadores para o ano corrente + 4 seguintes."""
+    os 4 indicadores para o ano corrente + 3 seguintes."""
     data_referencia = _data_mais_recente()
     anos = _anos_padrao()
 
