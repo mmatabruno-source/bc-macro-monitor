@@ -9,6 +9,14 @@ description: "Task list for feature 002-relatorio-politica-monetaria"
 
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md
 
+> **Nota (2026-07-05, trilha leve)**: as tasks abaixo documentam a
+> implementação original (2026-07-03) e permanecem como registro
+> histórico. Dois pontos mudaram depois, por edição direta — ver
+> `research.md` R5 (endpoint `ri/relatorios` → `rpm/relatorios`) e R6
+> (análise em 3 seções/4 mensagens → 2 seções/3 mensagens). O código e
+> `data-model.md` refletem o estado atual; as referências a "cenário
+> macro/projeções/portfólio" e "4 mensagens" abaixo são históricas.
+
 **Tests**: Incluídos — idempotência e o fallback FR-006 justificam testes desde já.
 
 **Organization**: Tarefas agrupadas por user story (US1, US2, US3), com Setup, Foundational (mínima, reaproveita `src/comum/` do fluxo 001) e Polish.

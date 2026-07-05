@@ -8,6 +8,20 @@
 
 **Input**: User description: "Resumo semanal do Focus com IPCA, Selic, Câmbio e PIB Total, valor de hoje para os próximos 5 anos, com comparação vs há 1 semana via histórico próprio, sem contador de sequência"
 
+> **Atualização (2026-07-05, trilha leve — ver `research.md`)**: dois
+> pontos mudaram depois da implementação inicial, por pedido do usuário:
+> 1. Reduzido de 5 para **4 anos no total** (ano corrente + 3 seguintes),
+>    não 4 seguintes.
+> 2. A indicação de direção (FR-004) deixou de ser texto
+>    "(subiu)/(desceu)/(manteve)" e virou seta com a magnitude da
+>    variação entre parênteses: `(▲ X,XX p.p.)` / `(▼ X,XX p.p.)` /
+>    `(= 0 p.p.)`. Títulos de indicador também ganharam unidade explícita
+>    (`IPCA (a.a.)`, `Câmbio (BRL/USD)`, `PIB (var. sobre o ano anterior)`,
+>    com sufixo `%` nos valores do PIB).
+> As FRs/SC/Assumptions abaixo foram atualizadas para o estado atual; os
+> User Scenarios (narrativa original) permanecem como registro histórico
+> do pedido inicial.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Receber um resumo semanal dos 4 principais indicadores do Focus (Priority: P1)
@@ -121,11 +135,13 @@ afetados.
   registrada no histórico deste fluxo.
 - **FR-003**: O sistema MUST enviar, a cada nova divulgação semanal, uma
   mensagem contendo o valor "hoje" de cada um dos 4 indicadores, para o
-  ano corrente e os 4 anos seguintes (5 anos no total).
-- **FR-004**: O sistema MUST indicar a direção (subiu/desceu/manteve) de
-  cada valor comparado ao valor do mesmo indicador/ano registrado na
-  checagem semanal anterior deste fluxo — nunca ao "há 1 semana" que o
-  boletim oficial já calcula internamente.
+  ano corrente e os 3 anos seguintes (4 anos no total — ver Atualização).
+- **FR-004**: O sistema MUST indicar a direção de cada valor comparado ao
+  valor do mesmo indicador/ano registrado na checagem semanal anterior
+  deste fluxo — nunca ao "há 1 semana" que o boletim oficial já calcula
+  internamente — exibida como seta com a magnitude da variação em p.p.
+  entre parênteses (`(▲ X,XX p.p.)` / `(▼ X,XX p.p.)` / `(= 0 p.p.)`, ver
+  Atualização acima).
 - **FR-005**: O sistema MUST omitir a indicação de direção para
   combinações indicador/ano sem registro anterior no histórico deste
   fluxo (primeira leitura).
@@ -148,7 +164,7 @@ afetados.
 
 - **ResumoSemanalFocus**: representa a divulgação processada numa
   checagem, contendo a data de referência e os valores dos 4 indicadores
-  para os 5 anos cobertos.
+  para os 4 anos cobertos (ver Atualização acima).
 - **ValorIndicadorAno**: um par (indicador, ano) com seu valor mais
   recente e, se houver histórico anterior, a direção comparada a ele.
 - **Registro de Estado/Histórico deste Fluxo**: guarda, por
@@ -166,7 +182,7 @@ afetados.
 - **SC-002**: Zero mensagens duplicadas para a mesma divulgação semanal já
   processada.
 - **SC-003**: 100% dos valores exibidos no resumo correspondem ao ano
-  corrente e aos 4 anos seguintes, para os 4 indicadores definidos (IPCA,
+  corrente e aos 3 anos seguintes, para os 4 indicadores definidos (IPCA,
   Selic, Câmbio, PIB Total).
 - **SC-004**: Uma falha inesperada neste fluxo nunca impede que os outros
   fluxos monitorados pelo mesmo sistema completem sua checagem e
@@ -179,8 +195,8 @@ afetados.
   por ser o mesmo domínio temático (Focus) — não é criado um bot novo para
   este fluxo, a menos que o usuário indique o contrário na fase de
   planejamento.
-- O ano corrente e os 4 anos seguintes são calculados a partir da data de
-  execução do sistema (ano atual + 4), não de uma lista fixa de anos.
+- O ano corrente e os 3 anos seguintes são calculados a partir da data de
+  execução do sistema (ano atual + 3), não de uma lista fixa de anos.
 - O formato exato do payload da API de expectativas anuais já foi
   verificado por chamadas de teste reais em 2026-07-04 (ver
   `research.md`/`contracts/` na fase de planejamento) — os nomes reais de

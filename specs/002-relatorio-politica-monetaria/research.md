@@ -47,7 +47,46 @@
 - **Status**: ✅ Resolvido — `identificador` (`"YYYYMM"`), mais simples e
   estável que derivar de `dataReferencia`.
 
+## R5 — Endpoint renomeado (`ri` → `rpm`), descoberto em produção
+
+- **Status**: ✅ Resolvido em 2026-07-05, via chamada de teste real
+  (trilha leve — registro conforme constituição v2.0.0, Princípio I).
+- **Contexto**: o fluxo continuava "avisando" sobre o mesmo relatório
+  (`202412`, dez/2024) meses depois em produção. Não era bug de
+  idempotência — era a fonte de dados desatualizada.
+- **Decision**: o documento foi renomeado de "Relatório de Inflação" para
+  "Relatório de Política Monetária" a partir da edição de mar/2025
+  (`202503`). O endpoint de R1 (`sitebcb/ri/relatorios`) é especificamente
+  o dataset do nome antigo e parou de receber itens novos, travado em
+  `202412`. O endpoint correto e atual é `sitebcb/rpm/relatorios` — mesmo
+  schema, confirmado com payload real (`identificador` mais recente:
+  `202606`, referência 2026-06-25). `contracts/relatorio-dataset.md`
+  atualizado com o payload novo.
+- **Rationale**: mesmo padrão de risco do Princípio II — um contrato
+  verificado pode ficar obsoleto se a fonte mudar de comportamento sem
+  aviso; a verificação precisa ser refeita quando o comportamento em
+  produção diverge do esperado, não assumida como permanente.
+
+## R6 — Reformulação da análise crítica: visão cidadão + investidor
+
+- **Status**: ✅ Resolvido em 2026-07-05, por decisão do usuário (trilha
+  leve — registro conforme constituição v2.0.0, Princípio I).
+- **Decision**: as 3 seções originais (cenário macro, projeções de
+  inflação, implicação para portfólio) foram substituídas por 2: visão
+  crítica para o cidadão (o que é relevante estar consciente sobre o
+  país, a partir do relatório) e visão do investidor pessoa física
+  residente no Brasil (o que o relatório estimula ou desestimula fazer).
+  Cada seção em tópicos curtos com "▪️", não em parágrafos corridos.
+  Sequência de notificação passa de 4 para 3 mensagens (aviso + 2
+  análises). `AnaliseCritica` e os marcadores do parser (`gerador_analise.py`)
+  atualizados de acordo (`data-model.md` já reflete isso).
+- **Rationale**: decisão de produto do usuário — o formato anterior
+  (leitura mais técnica de portfólio) não era o que ele queria acompanhar;
+  o novo formato serve tanto a leitura cidadã quanto a de investidor
+  pessoa física, ambas em formato direto e escaneável.
+
 ## Resumo de bloqueios para a Phase 1
 
-Nenhum bloqueio restante. R1–R4 resolvidos com payload real e decisão do
-usuário em 2026-07-03; `contracts/relatorio-dataset.md` está completo.
+Nenhum bloqueio restante. R1–R6 resolvidos com payload real e decisões do
+usuário; `contracts/relatorio-dataset.md` e `data-model.md` estão
+atualizados com o estado atual (R5, R6).
