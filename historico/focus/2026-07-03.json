@@ -1,5 +1,6 @@
 {
   "data_referencia": "2026-07-03",
-  "mediana_selic": 14.25,
-  "reuniao_id": "R5/2026"
+  "mediana_selic": 14.0,
+  "reuniao_id": "R5/2026",
+  "selic_vigente": 14.25
 }
