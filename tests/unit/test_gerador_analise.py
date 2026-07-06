@@ -24,7 +24,7 @@ def test_gerar_analise_chama_claude_com_documento_pdf(mock_baixar, mock_anthropi
     )
     mock_cliente = MagicMock()
     mock_cliente.messages.create.return_value = MagicMock(
-        content=[MagicMock(text=texto_resposta)]
+        content=[MagicMock(type="text", text=texto_resposta)]
     )
     mock_anthropic_cls.return_value = mock_cliente
 
@@ -37,3 +37,27 @@ def test_gerar_analise_chama_claude_com_documento_pdf(mock_baixar, mock_anthropi
     conteudo = chamada.kwargs["messages"][0]["content"]
     assert conteudo[0]["type"] == "document"
     assert conteudo[0]["source"]["media_type"] == "application/pdf"
+
+
+@patch("src.relatorio.gerador_analise.anthropic.Anthropic")
+@patch("src.relatorio.gerador_analise._baixar_pdf", return_value=b"conteudo-pdf-fake")
+def test_gerar_analise_ignora_thinking_block_antes_do_texto(mock_baixar, mock_anthropic_cls):
+    """Reproduz o bug real de produção: com extended thinking, o content[0]
+    da resposta é um ThinkingBlock (sem .text utilizável), e o texto de
+    verdade vem num bloco 'text' posterior."""
+    texto_resposta = (
+        f"{MARCADOR_CIDADAO}\n▪️ Cidadão.\n"
+        f"{MARCADOR_INVESTIDOR}\n▪️ Investidor."
+    )
+    mock_cliente = MagicMock()
+    mock_cliente.messages.create.return_value = MagicMock(
+        content=[
+            MagicMock(type="thinking", text=None),
+            MagicMock(type="text", text=texto_resposta),
+        ]
+    )
+    mock_anthropic_cls.return_value = mock_cliente
+
+    analise = gerar_analise("https://exemplo.com/relatorio.pdf")
+
+    assert analise.visao_cidadao == "▪️ Cidadão."
