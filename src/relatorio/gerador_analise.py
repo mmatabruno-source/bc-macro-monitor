@@ -83,5 +83,5 @@ def gerar_analise(link_pdf):
         ],
     )
 
-    texto = resposta.content[0].text
+    texto = next(bloco.text for bloco in resposta.content if bloco.type == "text")
     return _parse_resposta(texto)
