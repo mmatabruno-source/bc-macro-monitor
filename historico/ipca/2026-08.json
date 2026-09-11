@@ -1,0 +1,51 @@
+{
+  "grupos": [
+    {
+      "nome": "Alimentação e bebidas",
+      "peso_mensal": 21.5115,
+      "variacao_mensal": -0.34
+    },
+    {
+      "nome": "Habitação",
+      "peso_mensal": 15.503,
+      "variacao_mensal": -1.87
+    },
+    {
+      "nome": "Artigos de residência",
+      "peso_mensal": 3.451,
+      "variacao_mensal": 0.64
+    },
+    {
+      "nome": "Vestuário",
+      "peso_mensal": 4.5963,
+      "variacao_mensal": 0.12
+    },
+    {
+      "nome": "Transportes",
+      "peso_mensal": 20.2696,
+      "variacao_mensal": -0.86
+    },
+    {
+      "nome": "Saúde e cuidados pessoais",
+      "peso_mensal": 13.7648,
+      "variacao_mensal": 0.23
+    },
+    {
+      "nome": "Despesas pessoais",
+      "peso_mensal": 10.2426,
+      "variacao_mensal": 1.3
+    },
+    {
+      "nome": "Educação",
+      "peso_mensal": 6.1601,
+      "variacao_mensal": 0.47
+    },
+    {
+      "nome": "Comunicação",
+      "peso_mensal": 4.5011,
+      "variacao_mensal": -0.09
+    }
+  ],
+  "mes_referencia": "2026-08",
+  "variacao_mensal": -0.32
+}
