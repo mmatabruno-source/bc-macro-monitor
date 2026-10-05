@@ -1,6 +1,6 @@
 {
   "ultima_expectativa_copom": {
-    "data_referencia": "2026-09-25",
+    "data_referencia": "2026-10-02",
     "mediana_selic": 13.5,
     "reuniao_id": "R7/2026"
   },
@@ -12,19 +12,19 @@
     "identificador": "202609"
   },
   "ultimo_resumo_focus": {
-    "data_referencia": "2026-09-25",
+    "data_referencia": "2026-10-02",
     "valores": {
       "Câmbio:2026": 5.2,
-      "Câmbio:2027": 5.2769,
+      "Câmbio:2027": 5.28,
       "Câmbio:2028": 5.3,
-      "Câmbio:2029": 5.3508,
-      "IPCA:2026": 4.9915,
-      "IPCA:2027": 4.3118,
-      "IPCA:2028": 3.8,
-      "IPCA:2029": 3.5003,
-      "PIB Total:2026": 1.8603,
-      "PIB Total:2027": 1.4105,
-      "PIB Total:2028": 1.825,
+      "Câmbio:2029": 5.33,
+      "IPCA:2026": 5.0129,
+      "IPCA:2027": 4.3007,
+      "IPCA:2028": 3.8007,
+      "IPCA:2029": 3.5108,
+      "PIB Total:2026": 1.8549,
+      "PIB Total:2027": 1.4,
+      "PIB Total:2028": 1.81,
       "PIB Total:2029": 2.0,
       "Selic:2026": 13.5,
       "Selic:2027": 12.0,
